@@ -76,8 +76,26 @@
     }
   ],
   "videos": [
-    { "id": "jJtFeyD73qw", "title": "EigenBytes Top Tier Journal Paper Review: Journal of Machine Learning Research" },
-    { "id": "aircAruvnKk", "title": "Deep Learning Lecture: Optimization" },
-    { "id": "5NgNicANyqM", "title": "Harvard CS50’s Artificial Intelligence with Python – Full University Course" }
+    {
+      "title": "EigenBytes Top Tier Journal Paper Review: Journal of Machine Learning Research",
+      "excerpt": "Step-by-step breakdown of the architecture & hyperparameter search framework.",
+      "youtubeId": "jJtFeyD73qw",
+      "duration": "18:42",
+      "tags": ["Paper Explainer", "Optimization"]
+    },
+    {
+      "title": "Deep Learning Lecture: Optimization",
+      "excerpt": "Step-by-step breakdown of the architecture & hyperparameter search framework.",
+      "youtubeId": "aircAruvnKk",
+      "duration": "18:42",
+      "tags": ["Paper Explainer", "Optimization"]
+    },
+    {
+      "title": "Harvard CS50’s Artificial Intelligence with Python – Full University Course",
+      "excerpt": "Step-by-step breakdown of the architecture & hyperparameter search framework.",
+      "youtubeId": "5NgNicANyqM",
+      "duration": "18:42",
+      "tags": ["Paper Explainer", "Optimization"]
+    }
   ]
 }
