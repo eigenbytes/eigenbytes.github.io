@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Previous Blogs — Eigenbytes</title>
+  <meta name="description" content="Archive of Eigenbytes.blog posts: AI, Data Science, ML, and AI Security." />
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0e1015" />
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+
+  <style>
+    /* ===== Evergreen & Ember palette (same tokens) ===== */
+    :root{
+      --bg: hsl(165 20% 6%);
+      --panel: hsl(165 18% 9%);
+      --panel-2: hsl(165 18% 12%);
+      --text: hsl(150 25% 92%);
+      --muted: hsl(160 10% 65%);
+      --brand: hsl(160 70% 45%);
+      --brand-2: hsl(30 85% 55%);
+      --ring: color-mix(in oklab, var(--brand), white 28%);
+      --radius: 18px;
+      --shadow: 0 10px 30px hsl(165 50% 2% / .6);
+      --card-w: clamp(260px, 38vw, 360px);
+    }
+    :root[data-theme="light"]{
+      --bg: hsl(160 25% 97%);
+      --panel: hsl(0 0% 100%);
+      --panel-2: hsl(160 25% 95%);
+      --text: hsl(165 25% 10%);
+      --muted: hsl(165 12% 35%);
+      --ring: color-mix(in oklab, var(--brand), black 25%);
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg: hsl(160 25% 97%);
+        --panel: hsl(0 0% 100%);
+        --panel-2: hsl(160 25% 95%);
+        --text: hsl(165 25% 10%);
+        --muted: hsl(165 12% 35%);
+        --ring: color-mix(in oklab, var(--brand), black 25%);
+      }
+    }
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0;
+      font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--brand), transparent 85%), transparent) no-repeat,
+        radial-gradient(1000px 500px at -10% 20%, color-mix(in oklab, var(--brand-2), transparent 85%), transparent) no-repeat,
+        var(--bg);
+      background-repeat:no-repeat; background-size:cover; background-position:center top;
+      color:var(--text); accent-color:var(--brand); scroll-behavior:smooth;
+    }
+    .container{ width:min(1200px,92%); margin-inline:auto }
+
+    header.site{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:saturate(120%) blur(10px);
+      background: color-mix(in oklab, var(--bg), transparent 40%);
+      border-bottom:1px solid color-mix(in oklab, var(--text), transparent 90%);
+    }
+    nav{ display:flex; align-items:center; gap:12px; padding:10px 0 }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:800 }
+    .brand .logo{
+      inline-size:36px; block-size:36px; display:grid; place-items:center; border-radius:12px;
+      background:linear-gradient(135deg,var(--brand),var(--brand-2)); color:white; box-shadow:var(--shadow); font-weight:900
+    }
+    .navlinks{ margin-left:auto; display:flex; flex-wrap:wrap; gap:8px }
+    .navlinks a{ padding:8px 12px; border-radius:999px; text-decoration:none; color:var(--text); opacity:.9 }
+    .navlinks a:is(:hover,:focus){ background:color-mix(in oklab, var(--panel), white 3%); outline:none }
+
+    .btn{
+      display:inline-flex; gap:.6rem; align-items:center;
+      border:1px solid color-mix(in oklab, var(--text), transparent 85%);
+      background:linear-gradient(180deg,
+        color-mix(in oklab, var(--panel), white 4%),
+        color-mix(in oklab, var(--panel-2), black 2%)
+      );
+      padding:.6rem .95rem; border-radius:12px; text-decoration:none; color:var(--text); box-shadow:var(--shadow);
+    }
+    .btn:hover{ transform:translateY(-1px) }
+    .btn:is(:focus-visible){ outline:2px solid var(--ring); outline-offset:2px }
+
+    .hero{ padding: clamp(36px, 6vw, 72px) 0 }
+    .hero h1{ margin:0 0 6px; font-size:clamp(28px,5vw,48px); line-height:1.05; letter-spacing:-.02em }
+    .lead{ color:var(--muted) }
+
+    .card{
+      background: color-mix(in oklab, var(--panel), transparent 0%);
+      border:1px solid color-mix(in oklab, var(--text), transparent 90%);
+      border-radius: var(--radius); padding:20px; box-shadow: var(--shadow)
+    }
+    .pill{
+      font-size:12px; padding:.25rem .55rem; border-radius:999px;
+      background: color-mix(in oklab, var(--brand), white 78%);
+      color: color-mix(in oklab, var(--brand), black 20%); font-weight:700
+    }
+
+    /* Archive layout */
+    section{ padding: clamp(28px, 5vw, 56px) 0 }
+    .filters{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:12px 0 }
+    .filters input[type="search"]{
+      padding:.55rem .8rem; border-radius:10px;
+      border:1px solid color-mix(in oklab, var(--text), transparent 88%);
+      background:var(--panel); color:var(--text)
+    }
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap }
+    .tabs button{
+      border:1px solid color-mix(in oklab, var(--text), transparent 85%);
+      background:var(--panel); padding:.45rem .8rem; border-radius:10px; color:var(--text); cursor:pointer
+    }
+    .tabs button[aria-selected="true"]{
+      outline:2px solid var(--ring);
+      background: color-mix(in oklab, var(--panel), white 3%)
+    }
+
+    .archive-group{ margin: 16px 0 24px }
+    .archive-grid{
+      display:grid; gap:16px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+
+    .post{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .post img{
+      width:100%; height:160px; object-fit:cover; border-radius:12px;
+      border:1px solid color-mix(in oklab, var(--text), transparent 90%);
+    }
+    .post .meta{ color:var(--muted); font-size:.9rem }
+
+    details.group summary{
+      cursor:pointer; list-style:none; padding:.6rem .9rem; border-radius:12px; user-select:none;
+      border:1px solid color-mix(in oklab, var(--text), transparent 88%); background:var(--panel)
+    }
+    details.group[open] summary{ background: color-mix(in oklab, var(--panel), white 3%) }
+
+    footer{
+      border-top:1px solid color-mix(in oklab, var(--text), transparent 90%);
+      padding:20px 0 60px; color:var(--muted)
+    }
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0 }
+  </style>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to content</a>
+
+  <header class="site">
+    <div class="container">
+      <nav aria-label="Primary">
+        <div class="brand">
+          <a class="logo" href="/" aria-label="Eigenbytes Home">EB</a>
+          <span>Eigenbytes</span>
+        </div>
+        <div class="navlinks" role="menubar">
+          <a role="menuitem" href="/">Home</a>
+          <a role="menuitem" href="/#blog">Blog</a>
+          <a role="menuitem" href="/#tutorials">Tutorials</a>
+          <a role="menuitem" href="/#videos">Videos</a>
+          <a role="menuitem" href="/more.html">About</a>
+        </div>
+        <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
+          <input id="site-search" placeholder="Search posts…" aria-label="Search posts" />
+          <button id="theme-toggle" class="btn" aria-pressed="false" title="Toggle theme">🌓</button>
+          <a class="btn" href="/">⬅ Back</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container">
+        <span class="pill">Archive</span>
+        <h1>Previous Blog Posts</h1>
+        <p class="lead">Browse every post we’ve published — filter by tag, search titles/excerpts, and jump by year.</p>
+
+        <div class="filters">
+          <div class="tabs" id="tag-bar" role="tablist" aria-label="Filter by tag"></div>
+          <button class="btn" id="clear-filters" title="Clear filters">Clear</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div id="year-index" class="card" aria-live="polite" style="display:flex; flex-wrap:wrap; gap:8px"></div>
+
+        <!-- Year groups render here -->
+        <div id="archive-host"></div>
+
+        <div style="display:flex; justify-content:center; margin-top:18px">
+          <button id="load-more" class="btn" style="display:none">Load more</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap">
+      <small>© <span id="year"></span> Eigenbytes.blog.</small>
+      <small><a href="/rss.xml" style="color:inherit">RSS</a></small>
+    </div>
+  </footer>
+
+  <!-- Post card template -->
+  <template id="post-card">
+    <article class="post card" data-tags="">
+      <img loading="lazy" src="" alt="">
+      <div class="meta"></div>
+      <h3 style="margin:.2rem 0 .1rem"></h3>
+      <p class="excerpt" style="margin:0 0 .4rem"></p>
+      <a class="btn" href="#">Read</a>
+    </article>
+  </template>
+
+  <script type="module">
+    // --- Theme toggle (same behavior) ---
+    const themeBtn = document.getElementById('theme-toggle');
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+    if(savedTheme) root.dataset.theme = savedTheme;
+    themeBtn?.addEventListener('click', ()=>{
+      const t = root.dataset.theme === 'light' ? 'dark' : 'light';
+      root.dataset.theme = t; localStorage.setItem('theme', t); themeBtn.setAttribute('aria-pressed', String(t==='dark'));
+    });
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // --- Data load ---
+    let posts = [];
+    try{
+      const res = await fetch('data/posts.json', { cache:'no-store' });
+      if(!res.ok) throw new Error(res.status);
+      const all = await res.json();
+      posts = (all.blog || []).slice().sort((a,b)=> new Date(b.date) - new Date(a.date));
+    }catch(e){
+      console.error('Failed to load posts.json', e);
+      posts = [];
+    }
+
+    // --- State ---
+    const state = { tag:'All', q:'', page:1, pageSize:24 };
+
+    // --- Build tag bar ---
+    const tagBar = document.getElementById('tag-bar');
+    const tags = ['All', ...new Set(posts.flatMap(p => p.tags || []))].sort((a,b)=>{
+      if(a==='All') return -1; if(b==='All') return 1; return a.localeCompare(b);
+    });
+    for(const t of tags){
+      const b = document.createElement('button');
+      b.textContent = t; b.setAttribute('role','tab');
+      b.setAttribute('aria-selected', String(t===state.tag));
+      b.addEventListener('click',()=>{
+        state.tag = t;
+        tagBar.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected','false'));
+        b.setAttribute('aria-selected','true');
+        state.page = 1;
+        render();
+      });
+      tagBar.appendChild(b);
+    }
+    document.getElementById('clear-filters').addEventListener('click', ()=>{
+      state.tag = 'All'; state.q = ''; state.page = 1;
+      tagBar.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected', String(x.textContent==='All')));
+      const s = document.getElementById('site-search'); if(s) s.value='';
+      render();
+    });
+
+    // --- Search wiring ---
+    const searchEl = document.getElementById('site-search');
+    searchEl?.addEventListener('input', ()=>{
+      state.q = searchEl.value.toLowerCase().trim();
+      state.page = 1; render();
+    });
+
+    // --- Helpers ---
+    const $tpl = document.getElementById('post-card');
+    function cardMatches(item){
+      const tagOk = state.tag==='All' || (item.tags||[]).includes(state.tag);
+      const q = state.q;
+      if(!q) return tagOk;
+      const hay = [item.title||'', item.excerpt||'', ...(item.tags||[])].join(' ').toLowerCase();
+      return tagOk && hay.includes(q);
+    }
+    function byYear(items){
+      return items.reduce((acc, p)=>{
+        const y = new Date(p.date).getFullYear();
+        (acc[y] ||= []).push(p); return acc;
+      }, {});
+    }
+    function renderCard(p){
+      const node = $tpl.content.cloneNode(true);
+      node.querySelector('img').src = p.img;
+      node.querySelector('img').alt = p.title;
+      node.querySelector('h3').textContent = p.title;
+      node.querySelector('.excerpt').textContent = p.excerpt || '';
+      node.querySelector('.meta').textContent =
+        new Date(p.date).toLocaleDateString() + (p.tags?.length ? ` • ${p.tags.join(', ')}`:'');
+      const a = node.querySelector('a'); a.href = p.url || '#';
+      a.setAttribute('aria-label', `Read: ${p.title}`);
+      return node;
+    }
+
+    // --- Render ---
+    const host = document.getElementById('archive-host');
+    const yearIndex = document.getElementById('year-index');
+    const loadMoreBtn = document.getElementById('load-more');
+
+    function render(){
+      host.innerHTML = '';
+      yearIndex.innerHTML = '';
+
+      const filtered = posts.filter(cardMatches);
+      const total = filtered.length;
+      const paged = filtered.slice(0, state.page * state.pageSize);
+
+      const grouped = byYear(paged);
+      const years = Object.keys(grouped).map(Number).sort((a,b)=> b-a);
+
+      // Year index chips
+      for(const y of years){
+        const chip = document.createElement('a');
+        chip.className = 'btn';
+        chip.href = `#year-${y}`;
+        chip.textContent = y;
+        yearIndex.appendChild(chip);
+      }
+
+      // Year sections
+      for(const y of years){
+        const wrap = document.createElement('details');
+        wrap.className = 'group archive-group';
+        wrap.id = `year-${y}`;
+        wrap.open = true;
+
+        const sum = document.createElement('summary');
+        sum.innerHTML = `<strong>${y}</strong> — ${grouped[y].length} post${grouped[y].length>1?'s':''}`;
+        wrap.appendChild(sum);
+
+        const grid = document.createElement('div');
+        grid.className = 'archive-grid';
+        for(const p of grouped[y]){
+          grid.appendChild( renderCard(p) );
+        }
+        wrap.appendChild(grid);
+        host.appendChild(wrap);
+      }
+
+      // Pagination control
+      const shown = paged.length;
+      if(shown < total){ loadMoreBtn.style.display = 'inline-flex'; }
+      else{ loadMoreBtn.style.display = 'none'; }
+    }
+
+    loadMoreBtn.addEventListener('click', ()=>{
+      state.page += 1; render();
+      // scroll to the newly added area smoothly
+      loadMoreBtn.scrollIntoView({ behavior:'smooth', block:'center' });
+    });
+
+    render();
+
+    // --- PWA optional ---
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    }
+  </script>
+</body>
+</html>

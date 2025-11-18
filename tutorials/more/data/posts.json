@@ -1,0 +1,28 @@
+{
+"tutorials": [
+    {
+      "title": "From Question to Baseline: the First Lesson in Data Science",
+      "level": "Beginner",
+      "tags": ["EDA", "Data Splits", "Leakage", "Baseline", "Evaluation"],
+      "img": "tutorials/t1/logo.png",
+      "excerpt": "Start simple and reproducible: (1) clarify the question, (2) explore data, (3) split properly to avoid leakage, (4) train a baseline, (5) evaluate and write down learnings.",
+      "url": "/tutorials/t1/t1.html"
+    },
+    {
+      "title": "Hands-On: Azure Data Lake to Feature Store in 30 Minutes",
+      "level": "Intermediate",
+      "tags": ["Data Engineering"],
+      "img": "tutorials/t2/logo.png",
+      "excerpt": "From ingestion to feature materialization with validation and drift checks.",
+      "url": "/tutorials/t2/t2.html"
+    },
+    {
+      "title": "Harden Your LLM App with a Policy Firewall",
+      "level": "Advanced",
+      "tags": ["AI Security"],
+      "img": "tutorials/t3/logo.png",
+      "excerpt": "Implement guardrails, rate-limits, and red-teaming hooks.",
+      "url": "/tutorials/t3/t3.html"
+    }
+  ]
+}

@@ -1,0 +1,454 @@
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vertical Federated Learning — Concepts, Advances, and Challenges (Explained)</title>
+  <meta name="description" content="A comprehensive, image-rich explainer of the 2024 IEEE TKDE survey on Vertical Federated Learning (VFL): what it is, how it works, why it matters, and how to build it responsibly." />
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0e1015" />
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <!-- Open Graph -->
+  <meta property="og:title" content="Vertical Federated Learning — Concepts, Advances, and Challenges (Explained)" />
+  <meta property="og:description" content="End-to-end guide to VFL with diagrams: protocols, privacy, efficiency, effectiveness, and the VFLow framework." />
+  <meta property="og:type" content="article" />
+  <style>
+    :root {
+      --bg: #0e1015;
+      --bg-soft: #161a22;
+      --text: #e7ecf3;
+      --muted: #9fb0c3;
+      --brand: #6ad0ff;
+      --accent: #ff8b6a;
+      --ok: #62d394;
+      --warn: #ffcf5a;
+      --danger: #ff6a8b;
+      --code: #0b0f14;
+      --chip: #222733;
+    }
+    html[data-theme="light"]{
+      --bg:#ffffff; --bg-soft:#f6f8fb; --text:#0a0b0e; --muted:#415264; --brand:#0052cc; --accent:#c23a00; --ok:#007a3d; --warn:#b36b00; --danger:#aa0033; --code:#0a0f14; --chip:#e9eef6;
+    }
+    body { margin: 0; font: 16px/1.65 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji"; background: var(--bg); color: var(--text); }
+    header { padding: 48px 20px 16px; max-width: 980px; margin: 0 auto; }
+    header h1 { font-size: clamp(28px, 3.6vw, 44px); line-height: 1.1; margin: 0 0 12px; letter-spacing: 0.2px; }
+    header p { margin: 0; color: var(--muted); }
+    main { max-width: 980px; padding: 12px 20px 80px; margin: 0 auto; }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 0; }
+    .chip { background: var(--chip); color: var(--text); padding:6px 10px; border-radius:999px; font-size:12px; }
+    .card { background: var(--bg-soft); border: 1px solid #1f2633; border-radius: 14px; padding: 18px 18px; }
+    .grid { display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); }
+    .muted { color: var(--muted); }
+    .toc { background: var(--bg-soft); border:1px dashed #2a3242; border-radius:12px; padding:14px 16px; }
+    a{ color: var(--brand); text-decoration: none; }
+    a:hover{ text-decoration: underline; }
+    h2{ margin-top:38px; }
+    h3{ margin-top:28px; }
+    code, pre { background: var(--code); color: var(--text); }
+    pre { padding: 14px; border-radius: 10px; overflow:auto; }
+    figure { margin: 22px 0; background: var(--bg-soft); border:1px solid #1f2633; border-radius:12px; padding:8px; }
+    figcaption { font-size: 12px; color: var(--muted); padding: 6px 8px 4px; }
+    .callout { border-left: 4px solid var(--brand); padding: 10px 12px; background: #111723; border-radius: 6px; }
+    .pill { display:inline-block; background: #1d2431; padding: 2px 8px; border-radius:999px; font-size: 12px; margin-left: 6px; color: var(--muted); }
+    .kbd{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background:#0d1220; border:1px solid #1f2633; padding:2px 6px; border-radius:6px;}
+    .legend { font-size: 12px; color: var(--muted); }
+    .summary-box { border:1px solid #283044; border-radius:12px; padding:14px 16px; background:linear-gradient(180deg, #111728, #0d1322); }
+    footer { padding: 40px 20px; color: var(--muted); }
+    /* simple horizontal scroller for chips or figures if overflowing */
+    .x-scroll { overflow-x:auto; -webkit-overflow-scrolling: touch; padding-bottom:4px; }
+    .ref { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Vertical Federated Learning (VFL): A Field Guide to Concepts, Advances, and Challenges</h1>
+    <p class="muted">Based on the 2024 IEEE TKDE survey “Vertical Federated Learning: Concepts, Advances, and Challenges.” Updated for practitioners.</p>
+    <div class="chips x-scroll">
+      <span class="chip">Federated Learning</span>
+      <span class="chip">Privacy-Preserving ML</span>
+      <span class="chip">Cross-Silo Collaboration</span>
+      <span class="chip">Security &amp; Fairness</span>
+      <span class="chip">Survey Deep-Dive</span>
+    </div>
+  </header>
+    <main>
+    <section class="summary-box">
+      <h2>TL;DR</h2>
+      <p>
+        <strong>VFL</strong> lets organizations holding <em>different features about the same users</em> train a joint model without sharing raw data. Compared with horizontal FL (same features, different users), VFL exchanges <em>intermediate computations</em> to protect privacy, and typically runs in <span class="pill">cross-silo</span> settings (e.g., bank + retailer). The 2024 survey maps the space—protocols, efficiency tricks, learning with limited labels, attack/defense patterns, and a unifying design framework called <strong>VFLow</strong>.  [oai_citation:0‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)
+      </p>
+    </section>
+    <section class="toc">
+    <strong>On this page</strong>
+    <ol>
+      <li><a href="#what">What is VFL (and how it differs from HFL/FTL)?</a></li>
+      <li><a href="#protocol">Training protocol: alignment → collaborative SGD</a></li>
+      <li><a href="#variants">Model variants: splitVFL vs aggVFL</a></li>
+      <li><a href="#comm">Making VFL efficient: async, one-shot, compression</a></li>
+      <li><a href="#perf">Making VFL effective with little labeled overlap</a></li>
+      <li><a href="#privacy">Privacy threats and defenses (labels & features)</a></li>
+      <li><a href="#backdoor">Backdoor attacks & defenses</a></li>
+      <li><a href="#ecosystem">Valuation, explainability, and fairness</a></li>
+      <li><a href="#vflow">VFLow: a design meta-framework</a></li>
+      <li><a href="#build">Build-ready checklist</a></li>
+    </ol>
+    </section>
+
+    <section id="what">
+      <h2>1) What is VFL?</h2>
+      <p>
+        In <strong>Vertical Federated Learning</strong>, parties share the <em>same users (IDs)</em> but own <em>different columns (features)</em>. Contrast:
+      </p>
+      <ul>
+        <li><strong>HFL</strong> — same features, different users.</li>
+        <li><strong>VFL</strong> — same users, different features (our focus).</li>
+        <li><strong>FTL</strong> — both users and features differ with limited overlaps.</li>
+      </ul>
+      <p class="ref">Source: survey definitions and taxonomy.  [oai_citation:1‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+
+      <figure>
+        <!-- Inline SVG: HFL vs VFL vs FTL -->
+        <svg viewBox="0 0 900 260" width="100%" height="auto" role="img" aria-label="HFL vs VFL vs FTL">
+          <defs>
+            <style>
+              .b{fill:#1d2431;stroke:#2a3242;stroke-width:1.2;}
+              .t{fill:#e7ecf3;font: 12px/1.3 system-ui;}
+              .title{font: 600 14px system-ui;}
+              .chip{fill:#222b3a;stroke:#33415c;}
+              .muted{fill:#9fb0c3;}
+            </style>
+          </defs>
+          <rect class="b" x="10" y="10" width="280" height="240" rx="10"/>
+          <rect class="b" x="310" y="10" width="280" height="240" rx="10"/>
+          <rect class="b" x="610" y="10" width="280" height="240" rx="10"/>
+          <text class="title" x="30" y="34">HFL</text>
+          <text class="title" x="330" y="34">VFL</text>
+          <text class="title" x="630" y="34">FTL</text>
+
+          <!-- HFL block -->
+          <text class="t muted" x="30" y="56">Same features • Different users</text>
+          <rect class="chip" x="30" y="70" width="100" height="20" rx="10"/><text class="t" x="40" y="85">Feature set</text>
+          <rect class="chip" x="150" y="70" width="100" height="20" rx="10"/><text class="t" x="160" y="85">Feature set</text>
+          <rect class="chip" x="30" y="100" width="220" height="20" rx="10"/><text class="t" x="40" y="115">Users A</text>
+          <rect class="chip" x="30" y="130" width="220" height="20" rx="10"/><text class="t" x="40" y="145">Users B</text>
+
+          <!-- VFL block -->
+          <text class="t muted" x="330" y="56">Same users • Different features</text>
+          <rect class="chip" x="330" y="70" width="220" height="20" rx="10"/><text class="t" x="340" y="85">Users A=B</text>
+          <rect class="chip" x="330" y="100" width="100" height="20" rx="10"/><text class="t" x="340" y="115">Bank</text>
+          <rect class="chip" x="450" y="100" width="100" height="20" rx="10"/><text class="t" x="460" y="115">Retailer</text>
+
+          <!-- FTL block -->
+          <text class="t muted" x="630" y="56">Limited overlaps in both</text>
+          <rect class="chip" x="630" y="70" width="100" height="20" rx="10"/><text class="t" x="640" y="85">Users A</text>
+          <rect class="chip" x="750" y="70" width="100" height="20" rx="10"/><text class="t" x="760" y="85">Users B</text>
+          <rect class="chip" x="630" y="100" width="100" height="20" rx="10"/><text class="t" x="640" y="115">Feat A</text>
+          <rect class="chip" x="750" y="100" width="100" height="20" rx="10"/><text class="t" x="760" y="115">Feat B</text>
+        </svg>
+        <figcaption>HFL vs VFL vs FTL at a glance.</figcaption>
+      </figure>
+    </section>
+
+    <section id="protocol">
+      <h2>2) The VFL training protocol</h2>
+      <ol>
+        <li><strong>Private Entity Alignment (PSI)</strong> — find the intersection of user IDs without revealing non-overlaps.</li>
+        <li><strong>Collaborative Training</strong> — each party computes local outputs; the active party computes the loss, sends gradients back; parties update locally (SGD/GBDT, etc.).</li>
+      </ol>
+      <p class="ref">These two phases (alignment → training) structure nearly all VFL systems.  [oai_citation:2‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+
+      <figure>
+        <!-- Inline SVG: VFL message flow -->
+        <svg viewBox="0 0 900 280" width="100%" height="auto" role="img" aria-label="VFL alignment and training flow">
+          <defs>
+            <style>
+              .box{fill:#1c2330;stroke:#2a3242;stroke-width:1.2;rx:10;}
+              .text{fill:#e7ecf3;font: 12px system-ui;}
+              .small{fill:#9fb0c3;font: 11px system-ui;}
+              .arrow{stroke:#6ad0ff;stroke-width:2;marker-end:url(#m1);}
+              .grad{stroke:#ff8b6a;stroke-width:2;marker-end:url(#m2);}
+            </style>
+            <marker id="m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#6ad0ff" />
+            </marker>
+            <marker id="m2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#ff8b6a" />
+            </marker>
+          </defs>
+          <rect class="box" x="40" y="30" width="220" height="90"/>
+          <rect class="box" x="340" y="30" width="220" height="90"/>
+          <rect class="box" x="640" y="30" width="220" height="90"/>
+          <text class="text" x="60" y="55">Passive Party A</text>
+          <text class="small" x="60" y="75">features: x<tspan baseline-shift="sub">A</tspan></text>
+          <text class="text" x="360" y="55">Active Party</text>
+          <text class="small" x="360" y="75">features: x<tspan baseline-shift="sub">K</tspan>; labels y</text>
+          <text class="text" x="660" y="55">Passive Party B</text>
+          <text class="small" x="660" y="75">features: x<tspan baseline-shift="sub">B</tspan></text>
+
+          <text class="small" x="60" y="112">PSI: align IDs</text>
+          <text class="small" x="360" y="112">PSI coordinator</text>
+          <text class="small" x="660" y="112">PSI: align IDs</text>
+
+          <!-- Training arrows -->
+          <line class="arrow" x1="140" y1="160" x2="450" y2="160"/>
+          <line class="arrow" x1="740" y1="160" x2="450" y2="160"/>
+          <text class="small" x="170" y="150">send H<tspan baseline-shift="sub">A</tspan></text>
+          <text class="small" x="690" y="150">send H<tspan baseline-shift="sub">B</tspan></text>
+          <line class="grad" x1="450" y1="190" x2="140" y2="190"/>
+          <line class="grad" x1="450" y1="190" x2="740" y2="190"/>
+          <text class="small" x="200" y="205">∂ℒ/∂H<tspan baseline-shift="sub">A</tspan></text>
+          <text class="small" x="590" y="205">∂ℒ/∂H<tspan baseline-shift="sub">B</tspan></text>
+        </svg>
+        <figcaption>High-level message flow in VFL training (per mini-batch).</figcaption>
+      </figure>
+    </section>
+
+    <section id="variants">
+      <h2>3) Model variants: splitVFL vs aggVFL</h2>
+      <ul>
+        <li><strong>splitVFL</strong>: the active party owns a <em>trainable</em> global module (split neural networks across parties).</li>
+        <li><strong>aggVFL</strong>: the active party uses a <em>non-trainable</em> aggregator (e.g., sigmoid, optimal split in trees).</li>
+        <li>Tree-based VFL (GBDT/RF) is widely used; local “partial trees” aggregate into a full tree during training.</li>
+      </ul>
+      <p class="ref">Variant taxonomy and tree-based specifics summarized in the survey.  [oai_citation:3‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+    </section>
+
+    <section id="comm">
+      <h2>4) Making VFL <em>efficient</em></h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Multiple Local Updates</h3>
+          <p>Reduce syncs by doing several local steps per round (e.g., FedBCD / time-bounded local steps). Trade-off: more compute per party vs fewer comms.</p>
+        </div>
+        <div class="card">
+          <h3>Asynchronous Coordination</h3>
+          <p>Upload/download out of lock-step to shrink idle time; control staleness (drop unstable updates, bound delays, tree-structured comms).</p>
+        </div>
+        <div class="card">
+          <h3>One-Shot Training</h3>
+          <p>Learn local latent representations once, then the active party trains on shared representations. Beware privacy of those representations.</p>
+        </div>
+        <div class="card">
+          <h3>Compression & Selection</h3>
+          <p>Dimensionality reduction (PCA/autoencoders), sparse/quantized messages, gradient packing; sample/feature selection to shrink payloads.</p>
+        </div>
+      </div>
+      <p class="ref">Communication tricks and their trade-offs cataloged extensively.  [oai_citation:4‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+    </section>
+
+    <section id="perf">
+      <h2>5) Making VFL <em>effective</em> with limited labeled overlap</h2>
+      <p class="callout">Real deployments often have few <em>aligned + labeled</em> samples. The survey shows four families that squeeze more signal from the data you already have.</p>
+      <ol>
+        <li><strong>Self-Supervised</strong> — contrastive/autoencoding on unlabeled & unaligned data to pretrain local encoders.</li>
+        <li><strong>Semi-Supervised</strong> — pseudo-label & complete missing features to expand the training set safely.</li>
+        <li><strong>Knowledge Distillation</strong> — teach the active party a <em>local</em> predictor (useful when collaborative inference is impractical).</li>
+        <li><strong>Transfer Learning</strong> — treat active party as source domain; adapt knowledge to passive parties with few/no labels.</li>
+      </ol>
+      <p class="ref">Coverage of Self-SL, Semi-SL, KD, and TL under VFL constraints.  [oai_citation:5‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+
+      <figure>
+        <!-- Inline SVG: Virtual dataset partitions -->
+        <svg viewBox="0 0 900 200" width="100%" height="auto" role="img" aria-label="Virtual dataset partitions in VFL">
+          <defs>
+            <style>
+              .s{fill:#1d2431;stroke:#2a3242;stroke-width:1.2;}
+              .a{fill:#193024;}
+              .b{fill:#2a2030;}
+              .u{fill:#20303e;}
+              .t{fill:#e7ecf3;font: 12px system-ui;}
+              .cap{fill:#9fb0c3;font: 11px system-ui;}
+            </style>
+          </defs>
+          <rect class="s" x="30" y="30" width="840" height="140" rx="12"/>
+          <text class="cap" x="40" y="50">Virtual Dataset (two-party)</text>
+          <rect class="a" x="40" y="70" width="260" height="80" rx="8"/><text class="t" x="50" y="95">Aligned + Labeled (D)</text>
+          <rect class="u" x="310" y="70" width="200" height="80" rx="8"/><text class="t" x="320" y="95">Aligned + Unlabeled (D<span baseline-shift="sub">au</span>)</text>
+          <rect class="b" x="520" y="70" width="160" height="80" rx="8"/><text class="t" x="530" y="95">Unaligned A (D<span baseline-shift="sub">uu,A</span>)</text>
+          <rect class="b" x="690" y="70" width="160" height="80" rx="8"/><text class="t" x="700" y="95">Unaligned B (D<span baseline-shift="sub">uu,B</span>)</text>
+        </svg>
+        <figcaption>Where different learning strategies harvest signal (pretrain, augment, distill, transfer).</figcaption>
+      </figure>
+    </section>
+
+    <section id="privacy">
+      <h2>6) Privacy threats & defenses</h2>
+      <h3>Security protocols (P-levels)</h3>
+      <ul>
+        <li><strong>P-0</strong> (relaxed): labels or models may be non-private (e.g., white-box models).</li>
+        <li><strong>P-1</strong> (basic): keep data & models local; exchange plaintext intermediates.</li>
+        <li><strong>P-2</strong>: encrypt transmitted intermediates (HE/MPC/TEE hybrids).</li>
+        <li><strong>P-3</strong>: protect the entire training protocol (no training info revealed; MPC/SPDZ, etc.).</li>
+        <li><strong>P-4</strong>: also protect learned models (only final inference exposed).</li>
+      </ul>
+      <p class="ref">Progression of privacy guarantees and representative schemes.  [oai_citation:6‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+
+      <h3>Attack surface</h3>
+      <ul>
+        <li><strong>Label inference</strong>: gradients (sample-level or batch-level), trained local models, spectral/model-completion attacks.</li>
+        <li><strong>Feature inference</strong>: model/gradient inversion (white-box/black-box), reverse multiplication/protocol-aware attacks; tree-specific leakage.</li>
+      </ul>
+      <p class="ref">Comprehensive taxonomy of label/feature inference attacks and when they apply.  [oai_citation:7‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+
+      <h3>Defenses</h3>
+      <div class="grid">
+        <div class="card">
+          <h4>Cryptographic</h4>
+          <p>HE, MPC, SS, TEE, and hybrids; tailored protocols for LR/NN/GBDT; consider efficiency vs privacy envelope.</p>
+        </div>
+        <div class="card">
+          <h4>Non-crypto</h4>
+          <p>Differential privacy noise, gradient discretization/sparsification, masking/fake gradients; attack-specific defenses (e.g., CAE/DCAE, MARVELL, DRAVL).</p>
+        </div>
+      </div>
+
+      <figure>
+        <!-- Inline SVG: Threat map -->
+        <svg viewBox="0 0 900 320" width="100%" height="auto" role="img" aria-label="VFL threat and defense map">
+          <defs>
+            <style>
+              .panel{fill:#1d2431;stroke:#2a3242;stroke-width:1.2;rx:12;}
+              .t{fill:#e7ecf3;font: 12px system-ui;}
+              .h{fill:#9fb0c3;font: 11px system-ui;}
+              .attack{fill:#ff6a8b;}
+              .def{fill:#62d394;}
+            </style>
+          </defs>
+          <rect class="panel" x="20" y="20" width="860" height="280"/>
+          <text class="h" x="40" y="44">Attack vectors</text>
+          <circle class="attack" cx="120" cy="80" r="8"/><text class="t" x="140" y="84">Label inference (∂ℒ/∂H, ∇θ, local models)</text>
+          <circle class="attack" cx="120" cy="110" r="8"/><text class="t" x="140" y="114">Feature inference (model/gradient inversion)</text>
+          <circle class="attack" cx="120" cy="140" r="8"/><text class="t" x="140" y="144">Tree-specific leakage (ordering, thresholds)</text>
+          <text class="h" x="40" y="178">Defenses</text>
+          <rect x="40" y="190" width="360" height="90" class="panel"/>
+          <text class="t" x="60" y="210">Crypto: HE / MPC / SS / TEE / Hybrids</text>
+          <text class="t" x="60" y="230">Protocol hardening: P-2 → P-4</text>
+          <rect x="420" y="190" width="440" height="90" class="panel"/>
+          <text class="t" x="440" y="210">Non-crypto: DP noise, discretize/sparsify gradients</text>
+          <text class="t" x="440" y="230">Specialized: CAE/DCAE, MARVELL, DRAVL, masking</text>
+        </svg>
+        <figcaption>Map the attack to the cheapest defense that actually works in your P-level.</figcaption>
+      </figure>
+    </section>
+
+    <section id="backdoor">
+      <h2>7) Backdoor attacks & defenses</h2>
+      <p>Passive parties can be malicious: they can implant <em>targeted</em> triggers (map trigger → label τ) or run <em>non-targeted</em> poisoning (adversarial/noisy samples, missing features) to degrade performance. Robust feature-space recovery, disguising labels (CAE/DCAE), and regularization help; note cryptographic protection alone doesn’t neutralize backdoors (it preserves poisoned computations, too).</p>
+      <p class="ref">Backdoor scenarios and defenses summarized in the survey.  [oai_citation:8‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+    </section>
+
+    <section id="ecosystem">
+      <h2>8) Data valuation, explainability, fairness</h2>
+      <ul>
+        <li><strong>Valuation</strong>: feature/party Shapley, MI-based methods (powerful but compute-heavy); used to split gains or pick contributors.</li>
+        <li><strong>Explainability</strong>: credibility checks, counterfactuals, interpretable scorecards, explainable feature grouping—while balancing privacy.</li>
+        <li><strong>Fairness</strong>: adversarial de-biasing and constrained optimization to remove sensitive leakage under VFL’s privacy limits.</li>
+      </ul>
+      <p class="ref">Ecosystem building blocks for sustainable federations.  [oai_citation:9‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+    </section>
+
+    <section id="vflow">
+      <h2>9) VFLow: a design checklist for reality</h2>
+      <p><strong>VFLow</strong> is the paper’s unifying framework to co-optimize utility, privacy, efficiency, and fairness—plus a risk-evaluation module for attacks/defenses. Use it as a backbone for choosing model partition, protocol (P-level), efficiency tricks, and policy controls.</p>
+      <figure>
+        <!-- Inline SVG: VFLow schematic -->
+        <svg viewBox="0 0 900 360" width="100%" height="auto" role="img" aria-label="VFLow framework schematic">
+          <defs>
+            <style>
+              .section{fill:#1d2431;stroke:#2a3242;stroke-width:1.2;rx:12;}
+              .node{fill:#222b3a;stroke:#33415c;stroke-width:1;rx:10;}
+              .t{fill:#e7ecf3;font: 12px system-ui;}
+              .cap{fill:#9fb0c3;font: 11px system-ui;}
+              .link{stroke:#6ad0ff;stroke-width:2;opacity:.8;}
+            </style>
+          </defs>
+          <rect class="section" x="20" y="20" width="860" height="320"/>
+          <text class="cap" x="40" y="44">VFLow</text>
+          <rect class="node" x="40" y="60" width="240" height="90"/><text class="t" x="50" y="80">Model & Partition</text><text class="cap" x="50" y="100">splitVFL / aggVFL / tree</text>
+          <rect class="node" x="320" y="60" width="240" height="90"/><text class="t" x="330" y="80">Privacy Protocol</text><text class="cap" x="330" y="100">P-1 → P-4 (HE/MPC/SS/TEE)</text>
+          <rect class="node" x="600" y="60" width="240" height="90"/><text class="t" x="610" y="80">Efficiency</text><text class="cap" x="610" y="100">async, one-shot, compression</text>
+
+          <rect class="node" x="40" y="170" width="240" height="90"/><text class="t" x="50" y="190">Effectiveness</text><text class="cap" x="50" y="210">Self/Semi-SL, KD, TL</text>
+          <rect class="node" x="320" y="170" width="240" height="90"/><text class="t" x="330" y="190">Fairness & Explainability</text><text class="cap" x="330" y="210">debiasing, scorecards, CF</text>
+          <rect class="node" x="600" y="170" width="240" height="90"/><text class="t" x="610" y="190">Risk Evaluation</text><text class="cap" x="610" y="210">attacks ↔ defenses</text>
+
+          <line class="link" x1="160" y1="150" x2="160" y2="170"/>
+          <line class="link" x1="440" y1="150" x2="440" y2="170"/>
+          <line class="link" x1="720" y1="150" x2="720" y2="170"/>
+        </svg>
+        <figcaption>VFLow: choose parts, set privacy level, tune efficiency & effectiveness, then pressure-test security and fairness.</figcaption>
+      </figure>
+      <p class="ref">Framework overview and meta-objective outlined in the survey.  [oai_citation:10‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+    </section>
+
+    <section id="build">
+      <h2>10) Build-ready checklist</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Before you start</h3>
+          <ul>
+            <li>Define <strong>use-case & labels</strong> (who is active? who needs local inference?)</li>
+            <li>Map <strong>overlap sizes</strong> (aligned-labeled vs aligned-unlabeled vs unaligned)</li>
+            <li>Pick <strong>model family</strong> (NN vs GBDT) and <strong>variant</strong> (split/agg)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Privacy & Policy</h3>
+          <ul>
+            <li>Select <strong>P-level</strong> that meets regulation (P-2+ recommended)</li>
+            <li>Threat-model label & feature inference; plan defenses</li>
+            <li>Define <strong>auditability</strong> (logs, attestations, consents)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Efficiency</h3>
+          <ul>
+            <li>Budget latency/bandwidth; enable async or multi-local steps</li>
+            <li>Compress intermediates; consider representation learning</li>
+            <li>Failover for <span class="kbd">missing features</span> at inference</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Effectiveness</h3>
+          <ul>
+            <li>Pretrain encoders with <strong>Self-SL</strong> on unaligned data</li>
+            <li>Grow training set with <strong>Semi-SL</strong> (curated pseudo-labels)</li>
+            <li>Use <strong>KD</strong> if the active party needs solo inference</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Federation Health</h3>
+          <ul>
+            <li>Data valuation for incentives (feature/party Shapley)</li>
+            <li>Explainability package (scorecards/counterfactuals)</li>
+            <li>Fairness constraints + bias monitoring</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <hr style="border-color:#1f2633; margin: 40px 0;" />
+
+    <section id="faq">
+      <h2>FAQ</h2>
+      <p><strong>Q: Who should be the active party?</strong><br/>A: The party that owns the labels and can host the aggregation/global module; it also bears most confidentiality risk—plan governance accordingly.  [oai_citation:11‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+      <p><strong>Q: Can I avoid collaborative inference later?</strong><br/>A: Yes—distill the joint model into a local predictor for the active party using KD techniques enumerated in the survey.  [oai_citation:12‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+      <p><strong>Q: Do crypto defenses slow everything down?</strong><br/>A: They add overhead; that’s why async/one-shot/compression and careful protocol selection (P-2 vs P-3 vs P-4) matter.  [oai_citation:13‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)</p>
+    </section>
+
+    <section id="reference">
+      <h2>Reference</h2>
+      <p>
+        This post summarizes and interprets the survey: <em>Vertical Federated Learning: Concepts, Advances, and Challenges</em>, IEEE TKDE, 2024.  [oai_citation:14‡Vertical_Federated_Learning_Concepts_Advances_and_Challenges.pdf](file-service://file-TGYuPJXcyH9dRjuvTXjbuc)
+      </p>
+    </section>
+    </main>
+  <footer>
+    <div>© Eigenbytes.blog — AI • Data Science • ML • AI Security</div>
+  </footer>
+</body>
+</html>
+
+
+

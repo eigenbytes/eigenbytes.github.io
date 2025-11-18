@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hands-On: Azure Data Lake to Feature Store in 30 Minutes</title>
+  <meta name="description" content="Expanded step-by-step tutorial: learn why and how to connect Azure Data Lake to a Feature Store, with clear explanations of every step." />
+  <meta name="color-scheme" content="light dark">
+
+  <style>
+    :root{
+      --bg: hsl(165 20% 6%); --panel: hsl(165 18% 9%); --panel-2: hsl(165 18% 12%);
+      --text: hsl(150 25% 92%); --muted: hsl(160 10% 65%);
+      --brand: hsl(160 70% 45%); --brand-2: hsl(30 85% 55%);
+      --line: color-mix(in oklab, var(--text), transparent 90%); --code:#0b0f14;
+    }
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    article.container{max-width:980px;margin:0 auto;padding:28px 20px 64px}
+    h1{font-size:clamp(28px,3.6vw,44px);line-height:1.1;margin:.6rem 0}
+    h2{margin-top:34px} h3{margin-top:22px}
+    a{color:var(--brand)} a:hover{text-decoration:underline}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+    .summary{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0 18px}
+    pre,code{background:var(--code);color:var(--text)} pre{padding:12px;border-radius:10px;overflow:auto}
+    .pill{font-size:12px;padding:.25rem .55rem;border-radius:999px;background:color-mix(in oklab,var(--brand),white 78%);color:color-mix(in oklab,var(--brand),black 20%);font-weight:700}
+    .callout{border-left:4px solid var(--brand);background:color-mix(in oklab,var(--panel),white 3%);border-radius:10px;padding:12px;margin:12px 0}
+    hr{border:none;border-top:1px solid var(--line);margin:34px 0}
+    figure{margin:20px 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px}
+    figcaption{color:var(--muted);font-size:12px;padding:6px 8px 4px}
+  </style>
+</head>
+<body>
+<article class="container">
+
+<header>
+  <span class="pill">Tutorial • 30 Minutes</span>
+  <h1>Hands-On: Azure Data Lake to Feature Store</h1>
+  <p class="meta">A guided, beginner-friendly walkthrough that explains not only the <em>how</em> but also the <em>why</em> behind each step.</p>
+</header>
+
+<section class="summary">
+  <strong>Big Picture:</strong> Modern ML workflows need <em>consistent features</em> across training and serving. This tutorial shows how to take raw data in Azure Data Lake, clean it with Spark, and register it into a feature store (e.g. Feast). By the end, you’ll understand both the technical steps and the reasoning behind them.
+</section>
+
+<h2>Step 1 — Why Azure Data Lake + Feature Store?</h2>
+<div class="card">
+  <p><strong>Azure Data Lake Storage Gen2</strong> is a cost-effective way to store raw data (CSV, Parquet, JSON). It’s optimized for analytics workloads and can scale to petabytes.</p>
+  <p><strong>Feature Stores</strong> act as the “single source of truth” for ML features. They ensure that the features you train on are the exact same features you serve to your model in production.</p>
+  <p><em>Why this matters:</em> Without a feature store, it’s common to have “training/serving skew,” where features are computed differently in offline vs online systems, causing models to underperform.</p>
+</div>
+
+<h2>Step 2 — Prerequisites</h2>
+<ul>
+  <li>An Azure subscription with Data Lake Storage set up</li>
+  <li>A Databricks (or Spark) workspace to run transformations</li>
+  <li>A running Feature Store (Feast, Databricks FS, or Tecton)</li>
+  <li>Some sample data (e.g., a <code>transactions.csv</code> file uploaded to a container called <code>raw-data</code>)</li>
+</ul>
+
+<div class="callout"><strong>Tip:</strong> Keep raw data immutable. Always create transformed “feature tables” separately, so you never overwrite your raw ground truth.</div>
+
+<h2>Step 3 — Connect to Azure Data Lake</h2>
+<p>We use OAuth-based authentication to mount the data lake into Spark. Replace placeholders with your own IDs/secrets.</p>
+
+<pre><code class="language-python">
+spark.conf.set("fs.azure.account.auth.type.&lt;account&gt;.dfs.core.windows.net", "OAuth")
+spark.conf.set("fs.azure.account.oauth.provider.type.&lt;account&gt;.dfs.core.windows.net",
+  "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider")
+spark.conf.set("fs.azure.account.oauth2.client.id.&lt;account&gt;.dfs.core.windows.net", "&lt;CLIENT_ID&gt;")
+spark.conf.set("fs.azure.account.oauth2.client.secret.&lt;account&gt;.dfs.core.windows.net", "&lt;CLIENT_SECRET&gt;")
+spark.conf.set("fs.azure.account.oauth2.client.endpoint.&lt;account&gt;.dfs.core.windows.net", 
+  "https://login.microsoftonline.com/&lt;TENANT_ID&gt;/oauth2/token")
+
+df = spark.read.csv("abfss://raw-data@&lt;account&gt;.dfs.core.windows.net/transactions.csv", header=True, inferSchema=True)
+df.show(5)
+</code></pre>
+
+<p><em>Explanation:</em> Here we’re instructing Spark how to authenticate to Azure’s secure storage layer. Once mounted, reading a CSV feels no different than reading a local file — but under the hood, it’s coming from cloud storage.</p>
+
+<h2>Step 4 — Clean & Transform Data</h2>
+<p>Real-world raw data is rarely ready for modeling. You usually need to:</p>
+<ul>
+  <li>Handle missing values</li>
+  <li>Create derived features (ratios, flags, buckets)</li>
+  <li>Normalize timestamps</li>
+</ul>
+
+<pre><code class="language-python">
+from pyspark.sql.functions import col, when, dayofweek
+
+# Example: create new features
+features_df = df.withColumn("is_high_value", when(col("amount") &gt; 100, 1).otherwise(0)) \
+                .withColumn("day_of_week", dayofweek(col("timestamp")))
+
+features_df.printSchema()
+</code></pre>
+
+<p><em>Explanation:</em> We’ve derived two new features: a binary “high value” flag, and the day of week. These features are simple, but illustrate how business logic is encoded for ML.</p>
+
+<h2>Step 5 — Register Features in a Feature Store</h2>
+<p>With <strong>Feast</strong> (an open-source feature store), you define entities and feature views. Entities represent the thing you’re predicting on (e.g., <code>customer_id</code>), while feature views describe the features tied to those entities.</p>
+
+<pre><code class="language-python">
+from feast import Feature, Entity, FeatureView, Field
+from feast.types import Int64, String, Bool
+
+# Define entity
+customer = Entity(name="customer_id", join_keys=["customer_id"])
+
+# Define feature view
+transaction_fv = FeatureView(
+    name="transaction_features",
+    entities=[customer],
+    ttl=None,
+    schema=[
+        Field(name="is_high_value", dtype=Bool),
+        Field(name="day_of_week", dtype=String),
+    ],
+    online=True,
+)
+
+# Apply to store
+store.apply([customer, transaction_fv])
+</code></pre>
+
+<p><em>Explanation:</em> Once applied, the feature store now “knows” how to compute and serve these features consistently, whether you’re training offline or serving online.</p>
+
+<h2>Step 6 — Validate Your Features</h2>
+<p>Always verify that your features are accessible and correct before plugging them into models.</p>
+
+<pre><code class="language-python">
+store.get_historical_features(
+    entity_df="SELECT customer_id, event_timestamp FROM transactions",
+    features=["transaction_features:is_high_value", "transaction_features:day_of_week"],
+).to_df().head()
+</code></pre>
+
+<p><em>Explanation:</em> This checks that historical feature retrieval works — a critical step for reproducibility in training pipelines.</p>
+
+<hr/>
+
+<h2>Takeaways</h2>
+<ul>
+  <li><strong>Consistency:</strong> The same features feed training and production.</li>
+  <li><strong>Scalability:</strong> Azure Data Lake holds vast raw datasets cheaply.</li>
+  <li><strong>Modularity:</strong> Spark transforms → Feature definitions → Reusable assets for multiple models.</li>
+</ul>
+
+<div class="callout"><strong>Next steps:</strong> Automate this pipeline with scheduled jobs, and monitor feature quality/drift to ensure long-term reliability.</div>
+
+</article>
+</body>
+</html>

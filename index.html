@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Eigenbytes — AI • Data Science • ML • AI Security</title>
+  <meta name="description" content="Eigenbytes.blog — blogs on top-tier AI/ML/DS/AI-Sec papers, hands-on tutorials, curated videos, and a friendly skill-tiered community." />
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0e1015" />
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <!-- Open Graph -->
+  <meta property="og:title" content="Eigenbytes.blog" />
+  <meta property="og:description" content="Blogs, tutorials, videos, and community on AI/ML/Data Science/AI Security." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://eigenbytes.blog/" />
+  <meta property="og:image" content="https://eigenbytes.blog/og-cover.png" />
+
+  <!-- Firebase SDKs (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+  <style>
+    /* ===== Evergreen & Ember palette ===== */
+    :root{
+      /* Core surfaces & text (Dark) */
+      --bg: hsl(165 20% 6%);          /* deep evergreen */
+      --panel: hsl(165 18% 9%);       /* surface */
+      --panel-2: hsl(165 18% 12%);    /* raised surface */
+      --text: hsl(150 25% 92%);       /* near-white with a hint of green */
+      --muted: hsl(160 10% 65%);
+
+      /* Brand accents */
+      --brand: hsl(160 70% 45%);      /* emerald */
+      --brand-2: hsl(30 85% 55%);     /* ember/amber */
+      --ring: color-mix(in oklab, var(--brand), white 28%);
+
+      /* UI misc */
+      --radius: 18px;
+      --shadow: 0 10px 30px hsl(165 50% 2% / .6);
+    }
+
+    /* Light mode tokens (when html[data-theme="light"]) */
+    :root[data-theme="light"]{
+      --bg: hsl(160 25% 97%);
+      --panel: hsl(0 0% 100%);
+      --panel-2: hsl(160 25% 95%);
+      --text: hsl(165 25% 10%);
+      --muted: hsl(165 12% 35%);
+      --ring: color-mix(in oklab, var(--brand), black 25%);
+    }
+
+    /* If the user prefers light by default */
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg: hsl(160 25% 97%);
+        --panel: hsl(0 0% 100%);
+        --panel-2: hsl(160 25% 95%);
+        --text: hsl(165 25% 10%);
+        --muted: hsl(165 12% 35%);
+        --ring: color-mix(in oklab, var(--brand), black 25%);
+      }
+    }
+
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+
+    body {
+      margin: 0;
+      font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      
+      /* Background layers with NO REPEAT */
+      background:
+        radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--brand), transparent 85%), transparent) no-repeat,
+        radial-gradient(1000px 500px at -10% 20%, color-mix(in oklab, var(--brand-2), transparent 85%), transparent) no-repeat,
+        var(--bg);
+
+      background-repeat: no-repeat;        /* ensures images don’t tile */
+      background-size: cover;              /* scale to cover viewport */
+      background-position: center top;     /* position nicely */
+      
+      color: var(--text);
+      accent-color: var(--brand);
+      scroll-behavior: smooth;
+    }
+
+    .container{ width:min(1200px, 92%); margin-inline:auto }
+
+    header.site{
+      position:sticky; top:0;
+      backdrop-filter:saturate(120%) blur(10px);
+      background: color-mix(in oklab, var(--bg), transparent 40%);
+      border-bottom:1px solid color-mix(in oklab, var(--text), transparent 90%);
+      z-index:50;
+    }
+
+    nav{ display:flex; align-items:center; gap:12px; padding:10px 0 }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.3px }
+    .brand .logo{
+      inline-size:36px; block-size:36px; display:grid; place-items:center; border-radius:12px;
+      background:linear-gradient(135deg, var(--brand), var(--brand-2));
+      color:white; box-shadow: var(--shadow); font-weight:900
+    }
+    .navlinks{ margin-left:auto; display:flex; flex-wrap:wrap; gap:8px }
+    .navlinks a{
+      padding:8px 12px; border-radius:999px; text-decoration:none; color:var(--text); opacity:.9
+    }
+    .navlinks a:is(:hover,:focus){ background:color-mix(in oklab, var(--panel), white 3%); outline:none }
+
+    .btn{
+      display:inline-flex; gap:.6rem; align-items:center;
+      border:1px solid color-mix(in oklab, var(--text), transparent 85%);
+      background:linear-gradient(180deg,
+        color-mix(in oklab, var(--panel), white 4%),
+        color-mix(in oklab, var(--panel-2), black 2%)
+      );
+      padding:.6rem .95rem; border-radius:12px; text-decoration:none; color:var(--text);
+      box-shadow: var(--shadow);
+    }
+    .btn:hover{ transform:translateY(-1px) }
+    .btn:is(:focus-visible){ outline:2px solid var(--ring); outline-offset:2px }
+
+    .hero{ padding: clamp(40px, 8vw, 90px) 0; }
+    .hero-grid{ display:grid; gap:24px; grid-template-columns: 1.4fr 1fr; align-items:center }
+    .hero h1{ font-size:clamp(28px, 5vw, 56px); line-height:1.05; letter-spacing:-.02em; margin:0 }
+    .hero p{ color: var(--muted); font-size:clamp(16px, 1.8vw, 20px) }
+
+    .card{
+      background: color-mix(in oklab, var(--panel), transparent 0%);
+      border:1px solid color-mix(in oklab, var(--text), transparent 90%);
+      border-radius: var(--radius); padding:20px; box-shadow: var(--shadow)
+    }
+
+    .grid{ display:grid; gap:16px; grid-template-columns: repeat(12, 1fr) }
+    .g-4{ grid-column: span 4 } .g-6{ grid-column: span 6 }
+    .g-8{ grid-column: span 8 } .g-12{ grid-column: 1 / -1 }
+
+    @media (max-width: 900px){
+      .hero-grid{ grid-template-columns: 1fr }
+      .g-4, .g-6, .g-8{ grid-column: 1 / -1 }
+      .navlinks{ display:none }
+    }
+
+    section{ padding: clamp(36px, 6vw, 72px) 0 }
+    section h2{ margin:0 0 10px; font-size: clamp(22px, 3.2vw, 34px) }
+    section p.lead{ color:var(--muted); margin-top:0 }
+
+    .pill{
+      font-size:12px; padding:.25rem .55rem; border-radius:999px;
+      background: color-mix(in oklab, var(--brand), white 78%);
+      color: color-mix(in oklab, var(--brand), black 20%);
+      font-weight:700
+    }
+
+    /* =========================
+       Horizontal scrollers
+       ========================= */
+    /* --- Fix: keep cards the same width regardless of count --- */
+    :root{
+      /* one place to tweak card width across the site */
+      --card-w: clamp(260px, 38vw, 360px);
+      --video-w: clamp(320px, 60vw, 560px);
+    }
+
+    /* Blog & tutorial cards inside horizontal scrollers */
+    .list{
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      /* Optional: avoid space-between behavior from inherited styles */
+      justify-content: flex-start;
+    }
+
+    .post{
+      /* previously only had min-width; fix by locking basis + width */
+      flex: 0 0 var(--card-w);   /* no grow, no shrink, fixed basis */
+      width: var(--card-w);
+      min-width: var(--card-w);  /* belt-and-suspenders for older engines */
+      max-width: var(--card-w);
+
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scroll-snap-align: start;
+    }
+
+    .post img{
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    /* Do the same for videos so a single video doesn't stretch */
+    .video-grid{
+      display:flex;
+      gap:16px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      scroll-snap-type:x proximity;
+      scroll-padding-inline:12px;
+      -webkit-overflow-scrolling:touch;
+      justify-content:flex-start;
+    }
+
+    .video-grid .video{
+      flex: 0 0 var(--video-w);
+      width: var(--video-w);
+      min-width: var(--video-w);
+      max-width: var(--video-w);
+
+      position: relative;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid color-mix(in oklab, var(--text), transparent 90%);
+      scroll-snap-align: start;
+    }
+    .video-grid .video iframe{ position:absolute; inset:0; width:100%; height:100% }
+
+    /* Community */
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px }
+    .tabs button{
+      border:1px solid color-mix(in oklab, var(--text), transparent 85%);
+      background:var(--panel); padding:.45rem .8rem; border-radius:10px; color:var(--text); cursor:pointer
+    }
+    .tabs button[aria-selected="true"]{
+      outline:2px solid var(--ring);
+      background: color-mix(in oklab, var(--panel), white 3%)
+    }
+    .board{ display:none }
+    .board.active{ display:grid; gap:12px }
+    .message{
+      padding:12px; border:1px solid color-mix(in oklab, var(--text), transparent 88%);
+      border-radius:12px; background: color-mix(in oklab, var(--panel), white 3%)
+    }
+
+    /* Footer */
+    footer{
+      border-top:1px solid color-mix(in oklab, var(--text), transparent 90%);
+      padding:20px 0 60px; color:var(--muted)
+    }
+
+    /* Animations */
+    .reveal{ opacity:0; transform:translateY(10px); transition: opacity .6s ease, transform .6s ease }
+    .reveal.visible{ opacity:1; transform:none }
+
+    /* Utility */
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0 }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Eigenbytes.blog",
+    "url": "https://eigenbytes.blog/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://eigenbytes.blog/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to content</a>
+  <header class="site">
+    <div class="container">
+      <nav aria-label="Primary">
+        <div class="brand">
+          <img src="logo.png" alt="Eigenbytes logo">
+        </div>
+        <div class="navlinks" role="menubar">
+          <a role="menuitem" href="#blog">Blog</a>
+          <a role="menuitem" href="#tutorials">Tutorials</a>
+          <a role="menuitem" href="#videos">Videos</a>
+          <a role="menuitem" href="#community">Community</a>
+          <a role="menuitem" href="/more.html">About</a>
+          <a role="menuitem" href="#contact">Contact</a>
+        </div>
+        <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
+          <label class="sr-only" for="site-search">Search</label>
+          <input id="site-search" placeholder="Search…" style="padding:.55rem .8rem; border-radius:10px; border:1px solid color-mix(in oklab, var(--text), transparent 88%); background:var(--panel); color:var(--text)" />
+          <button id="theme-toggle" class="btn" aria-pressed="false" title="Toggle theme">🌓</button>
+          <a class="btn" href="#subscribe">Subscribe</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="card reveal">
+          <h1>Cutting-edge insights in <span style="background:linear-gradient(90deg,var(--brand),var(--brand-2)); -webkit-background-clip:text; background-clip:text; color:transparent">AI • Data Science • ML • AI Security</span></h1>
+          <p>Peer into top-tier papers with plain-English breakdowns, ship real-world tutorials, binge curated videos, and collaborate in a welcoming community across skill levels.</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px">
+            <a class="btn" href="#blog">Read the Blog</a>
+            <a class="btn" href="#tutorials">Try a Tutorial</a>
+          </div>
+        </div>
+        <div class="reveal">
+          <div class="card" style="display:grid; gap:12px">
+            <div>
+              <span class="pill">New</span>
+              <h3 style="margin:.4rem 0 0">Weekly Paper Dives</h3>
+              <p class="meta">We distill NeurIPS/ICML/ICLR/JMLR/USENIX works into takeaways you can implement.</p>
+            </div>
+            <div>
+              <span class="pill">Hands-on</span>
+              <h3 style="margin:.4rem 0 0">Practical Tutorials</h3>
+              <p class="meta">From data pipelines to secure LLM deployments—copy, paste, and ship.</p>
+            </div>
+            <div>
+              <span class="pill">Community</span>
+              <h3 style="margin:.4rem 0 0">Skill-Tiered Groups</h3>
+              <p class="meta">Ask/answer questions in Beginner • Intermediate • Advanced • Researcher boards.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="blog" class="reveal">
+      <div class="container">
+        <h2>Blog — Top-Tier Paper Reviews</h2>
+        <p class="lead">Digestible breakdowns of frontier research with code pointers and diagrams.</p>
+        <div id="blog-tags" class="tabs" role="tablist" aria-label="Filter blog by tag"></div>
+        <div class="list" id="blog-list" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="tutorials" class="reveal">
+      <div class="container">
+        <h2>Tutorials — Real-World How-Tos</h2>
+        <p class="lead">End-to-end guides for data science, ML pipelines, LLM safety, and MLOps.</p>
+        <div id="tutorial-tags" class="tabs" role="tablist" aria-label="Filter tutorials by tag"></div>
+        <div class="list" id="tutorial-list" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="videos" class="reveal">
+      <div class="container">
+        <h2>Video Library</h2>
+        <p class="lead">Curated talks, lectures, and explainers.</p>
+        <div class="video-grid" id="video-grid"></div>
+      </div>
+    </section>
+
+    <section id="community" class="reveal">
+      <div class="container">
+        <h2>Community — Ask & Answer by Skill Level</h2>
+        <p class="lead">Backed by Firebase Realtime Database — post questions and share answers by skill level.</p>
+        <div class="tabs" role="tablist" aria-label="Community groups">
+          <button role="tab" aria-selected="true" aria-controls="board-beginner" id="tab-beginner">Beginner</button>
+          <button role="tab" aria-selected="false" aria-controls="board-intermediate" id="tab-intermediate">Intermediate</button>
+          <button role="tab" aria-selected="false" aria-controls="board-advanced" id="tab-advanced">Advanced</button>
+          <button role="tab" aria-selected="false" aria-controls="board-researcher" id="tab-researcher">Researcher</button>
+        </div>
+        <div id="board-beginner" class="board active" role="tabpanel" aria-labelledby="tab-beginner"></div>
+        <div id="board-intermediate" class="board" role="tabpanel" aria-labelledby="tab-intermediate"></div>
+        <div id="board-advanced" class="board" role="tabpanel" aria-labelledby="tab-advanced"></div>
+        <div id="board-researcher" class="board" role="tabpanel" aria-labelledby="tab-researcher"></div>
+      </div>
+    </section>
+
+    <section id="about" class="reveal">
+      <div class="container grid">
+        <div class="g-8 card">
+          <h2>About Eigenbytes</h2>
+          <p>Eigenbytes.blog is a hub for high-signal learning in AI, Data Science, Machine Learning, and AI Security. We summarize papers, build production-oriented tutorials, and cultivate a collaborative community across experience levels.</p>
+          <a class="btn" href="/more.html">More</a>
+          <ul>
+            <li>Bias toward practical takeaways and reproducible examples</li>
+            <li>Security-first mindset for modern AI systems</li>
+            <li>Open, friendly, and beginner-safe community</li>
+          </ul>
+        </div>
+        <aside class="g-4 card">
+          <h3>Subscribe</h3>
+          <p>Join the newsletter for weekly paper dives and tutorials.</p>
+          <form id="subscribe" onsubmit="event.preventDefault(); alert('Subscribed! Thank you very much.');">
+            <label for="email" class="sr-only">Email</label>
+            <input id="email" type="email" required placeholder="you@domain.com" style="width:100%; padding:.7rem .9rem; border-radius:12px; border:1px solid color-mix(in oklab, var(--text), transparent 88%); background:var(--panel); color:var(--text)">
+            <div style="height:10px"></div>
+            <button class="btn" type="submit">Subscribe</button>
+          </form>
+        </aside>
+      </div>
+    </section>
+
+    <section id="contact" class="reveal">
+      <div class="container grid">
+        <div class="g-6 card">
+          <h2>Contact</h2>
+          <form id="contact-form">
+            <label class="sr-only" for="name">Name</label>
+            <input id="name" name="name" placeholder="Your name" required style="width:100%; padding:.75rem 1rem; border-radius:12px; border:1px solid color-mix(in oklab, var(--text), transparent 88%); background:var(--panel); color:var(--text)">
+            <div style="height:10px"></div>
+            <label class="sr-only" for="email2">Email</label>
+            <input id="email2" name="email" type="email" placeholder="you@domain.com" required style="width:100%; padding:.75rem 1rem; border-radius:12px; border:1px solid color-mix(in oklab, var(--text), transparent 88%); background:var(--panel); color:var(--text)">
+            <div style="height:10px"></div>
+            <label class="sr-only" for="msg">Message</label>
+            <textarea id="msg" name="message" placeholder="How can we help?" rows="5" required style="width:100%; padding:.75rem 1rem; border-radius:12px; border:1px solid color-mix(in oklab, var(--text), transparent 88%); background:var(--panel); color:var(--text)"></textarea>
+            <div style="height:10px"></div>
+            <button class="btn" type="submit">Send</button>
+          </form>
+          <p class="meta">Contact form.</p>
+        </div>
+        <div class="g-6 card">
+          <h3>Additional Sections</h3>
+          <ul>
+            <li><strong>Resources:</strong> curated links to datasets, benchmarks, and papers.</li>
+            <li><strong>Jobs Board:</strong> roles in ML/AI/AI-Sec (optional, add later).</li>
+            <li><strong>Events:</strong> conferences & meetups calendar.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div style="display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap">
+        <small>© <span id="year"></span> Eigenbytes.blog. All rights reserved.</small>
+        <small><a href="privacy.html" style="color:inherit">Privacy</a> • <a href="terms.html" style="color:inherit">Terms</a> • <a href="feed.xml" style="color:inherit">RSS</a></small>
+      </div>
+    </div>
+  </br>
+  </footer>
+
+  <template id="post-card">
+    <article class="post card" data-tags="">
+      <img loading="lazy" src="" alt="">
+      <div class="meta"></div>
+      <h3></h3>
+      <p class="excerpt"></p>
+      <a class="btn" href="#">Read</a>
+    </article>
+  </template>
+
+  <script type="module">
+    // Make EigenBot toggle global (used by onclick)
+    window.toggleChat = function(){
+      const body = document.getElementById('chat-body');
+      body.style.display = (body.style.display === 'none' || !body.style.display) ? 'block' : 'none';
+    };
+
+    // --- Theme toggle ---
+    const themeBtn = document.getElementById('theme-toggle');
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+    if(savedTheme) document.documentElement.dataset.theme = savedTheme;
+    themeBtn?.addEventListener('click', ()=>{
+      const t = root.dataset.theme === 'light' ? 'dark' : 'light';
+      root.dataset.theme = t; localStorage.setItem('theme', t); themeBtn.setAttribute('aria-pressed', String(t==='dark'));
+    });
+
+    // --- Smooth reveal on scroll ---
+    const io = new IntersectionObserver((entries)=>{
+      for(const e of entries){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target);} }
+    }, { threshold: .15 });
+    document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
+
+    // ========= DOM refs needed by renderers (DEFINE BEFORE USING) =========
+    const $tpl = document.getElementById('post-card');   // template used by renderList
+
+    // --- Card renderer ---
+    function renderList(listId, items, kind='blog'){
+      const host = document.getElementById(listId);
+      host.innerHTML = '';
+      for(const it of items){
+        const node = $tpl.content.cloneNode(true);
+        const a = node.querySelector('a');
+        node.querySelector('img').src = it.img;
+        node.querySelector('img').alt = it.title;
+        node.querySelector('h3').textContent = it.title;
+        node.querySelector('.excerpt').textContent = it.excerpt;
+        node.querySelector('.meta').textContent =
+          kind==='blog'
+            ? new Date(it.date).toLocaleDateString() + ' • ' + (it.tags?.join(', ')||'')
+            : (it.level||'') + ' • ' + (it.tags?.join(', ')||'');
+        a.href = it.url || '#';
+        a.setAttribute('aria-label', `${kind==='blog'?'Read':'Open'}: ${it.title}`);
+        host.appendChild(node);
+      }
+    }
+
+    // --- Load posts from JSON file ---
+    let posts = { blog: [], tutorials: [], videos: [] };
+    try {
+      const res = await fetch('data/posts.json', { cache: 'no-store' }); // RELATIVE path
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      posts = await res.json();
+    } catch (e) {
+      console.error('Failed to load posts.json', e);
+      // Keep arrays empty; page will just show no cards
+    }
+
+    // ---------- Tag + search state ----------
+    const state = { blogTag:'All', tutorialTag:'All', query:'' };
+
+    // ---------- Tag helpers ----------
+    function getUniqueTags(items){
+      return [...new Set(items.flatMap(p => p.tags || []))].sort();
+    }
+
+    function buildTagBar(kind, items, containerId){
+      const el = document.getElementById(containerId);
+      if(!el) return;
+      el.innerHTML = '';
+      const tags = getUniqueTags(items);
+      const makeBtn = (label) => {
+        const b = document.createElement('button');
+        b.setAttribute('role','tab');
+        b.textContent = label;
+        const selected = (kind==='blog' ? state.blogTag : state.tutorialTag) === label;
+        b.setAttribute('aria-selected', String(selected));
+        b.addEventListener('click', () => {
+          if (kind==='blog') state.blogTag = label; else state.tutorialTag = label;
+          el.querySelectorAll('button[role="tab"]').forEach(btn => btn.setAttribute('aria-selected','false'));
+          b.setAttribute('aria-selected','true');
+          applyFiltersAndRender();
+        });
+        return b;
+      };
+      el.appendChild(makeBtn('All'));
+      tags.forEach(t => el.appendChild(makeBtn(t)));
+    }
+
+    function cardMatchesQuery(item, q){
+      if(!q) return true;
+      const hay = [item.title||'', item.excerpt||'', ...(item.tags||[])].join(' ').toLowerCase();
+      return hay.includes(q);
+    }
+
+    function applyFiltersAndRender(){
+      const blogFiltered = posts.blog
+        .filter(p => state.blogTag==='All' || (p.tags||[]).includes(state.blogTag))
+        .filter(p => cardMatchesQuery(p, state.query))
+        .sort((a,b) => new Date(b.date) - new Date(a.date)); // newest first
+
+      const tutFiltered = posts.tutorials
+        .filter(p => state.tutorialTag==='All' || (p.tags||[]).includes(state.tutorialTag))
+        .filter(p => cardMatchesQuery(p, state.query));
+
+      renderList('blog-list', blogFiltered, 'blog');
+      renderList('tutorial-list', tutFiltered, 'tutorial');
+    }
+
+    // Build tag bars, wire search, initial render
+    buildTagBar('blog', posts.blog, 'blog-tags');
+    buildTagBar('tutorial', posts.tutorials, 'tutorial-tags');
+
+    const searchEl = document.getElementById('site-search');
+    searchEl?.addEventListener('input', () => {
+      state.query = searchEl.value.toLowerCase().trim();
+      applyFiltersAndRender();
+    });
+
+    applyFiltersAndRender();
+
+    // --- Videos (single pass) ---
+    const videoGrid = document.getElementById('video-grid');
+    videoGrid.innerHTML = '';
+    for (const v of posts.videos) {
+      const wrap = document.createElement('div');
+      wrap.className = 'video card';
+      wrap.innerHTML = `<iframe loading="lazy" src="https://www.youtube.com/embed/${v.id}" title="${v.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+      videoGrid.appendChild(wrap);
+    }
+
+    /* =========================
+       Enhance horizontal scroll
+       ========================= */
+    function enhanceHorizontalScroll(container){
+      if(!container) return;
+
+      // Mouse wheel → horizontal scroll
+      container.addEventListener('wheel', (e)=>{
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          container.scrollLeft += e.deltaY;
+          e.preventDefault();
+        }
+      }, { passive:false });
+
+      // Click & drag
+      let isDown = false, startX = 0, sl = 0;
+      container.addEventListener('pointerdown', (e)=>{
+        isDown = true; startX = e.clientX; sl = container.scrollLeft;
+        container.setPointerCapture(e.pointerId);
+      });
+      container.addEventListener('pointermove', (e)=>{
+        if(!isDown) return;
+        container.scrollLeft = sl - (e.clientX - startX);
+      });
+      container.addEventListener('pointerup', ()=>{ isDown = false });
+      container.addEventListener('pointercancel', ()=>{ isDown = false });
+
+      // ARIA role
+      container.setAttribute('role','list');
+    }
+
+    ['blog-list','tutorial-list','video-grid'].forEach(id=>{
+      enhanceHorizontalScroll(document.getElementById(id));
+    });
+
+    // Mark items as listitems (initial + future)
+    const markItems = (hostSelector, itemSelector)=>{
+      const host = document.getElementById(hostSelector);
+      if(!host) return;
+      const mark = ()=> host.querySelectorAll(itemSelector).forEach(n=> n.setAttribute('role','listitem'));
+      mark();
+      const mo = new MutationObserver(mark);
+      mo.observe(host, { childList:true, subtree:true });
+    };
+    markItems('blog-list', '.post');
+    markItems('tutorial-list', '.post');
+    markItems('video-grid', '.video');
+
+    // ============================
+    //  FIREBASE COMMUNITY BOARDS
+    // ============================
+    const firebaseConfig = {
+      apiKey: "AIzaSyAttLnwkUSLUrQ7nHTS8GcW5v2J2jJrZTo",
+      authDomain: "real-time-messaging-2d127.firebaseapp.com",
+      databaseURL: "https://real-time-messaging-2d127-default-rtdb.firebaseio.com",
+      projectId: "real-time-messaging-2d127",
+      storageBucket: "real-time-messaging-2d127.firebasestorage.app",
+      messagingSenderId: "86196437184",
+      appId: "1:86196437184:web:ebbbfcf39c0f8c157e6d25",
+      measurementId: "G-7XCK1SJEHC"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const tabs = document.querySelectorAll('.tabs button[role="tab"]');
+    const boards = {
+      beginner: document.getElementById('board-beginner'),
+      intermediate: document.getElementById('board-intermediate'),
+      advanced: document.getElementById('board-advanced'),
+      researcher: document.getElementById('board-researcher')
+    };
+    const activeListeners = {};
+
+    firebase.auth().signInAnonymously()
+      .then(() => { renderBoard('beginner'); })
+      .catch((err) => console.error('Firebase auth failed:', err));
+
+    tabs.forEach(t=>t.addEventListener('click', ()=>{
+      tabs.forEach(b=>{ b.setAttribute('aria-selected','false'); });
+      t.setAttribute('aria-selected','true');
+      for(const id in boards){ boards[id].classList.remove('active'); }
+      const id = t.id.replace('tab-','');
+      boards[id].classList.add('active');
+      renderBoard(id);
+    }));
+
+    function renderBoard(id){
+      const el = boards[id];
+      if(!el) return;
+      el.innerHTML = '';
+
+      const form = document.createElement('form');
+      form.className = 'card';
+      form.innerHTML = `
+        <label class="sr-only" for="author-${id}">Name</label>
+        <input id="author-${id}" name="author" placeholder="Name (optional)" style="width:100%; padding:.6rem .8rem; border-radius:10px; border:1px solid color-mix(in oklab, var(--text), transparent 88%); background:var(--panel); color:var(--text)" />
+        <div style="height:8px"></div>
+        <label class="sr-only" for="message-${id}">Message</label>
+        <textarea id="message-${id}" name="message" rows="3" placeholder="Ask a question or share an insight…" required style="width:100%; padding:.6rem .8rem; border-radius:10px; border:1px solid color-mix(in oklab, var(--text), transparent 88%); background:var(--panel); color:var(--text)"></textarea>
+        <div style="height:8px"></div>
+        <button class="btn" type="submit">Post</button>
+      `;
+      el.appendChild(form);
+
+      const msgs = document.createElement('div');
+      el.appendChild(msgs);
+
+      if(activeListeners[id]){ activeListeners[id].off && activeListeners[id].off(); }
+      const path = `messages/community/${id}`;
+      const ref = firebase.database().ref(path);
+
+      ref.off();
+      ref.on('child_added', (snap)=>{
+        const { name, text, ts } = snap.val();
+        const div = document.createElement('div');
+        div.className = 'message';
+        const when = ts ? new Date(ts).toLocaleString() : '';
+        div.innerHTML = `<strong>${escapeHTML(name||'Anon')}</strong> <span class="meta">• ${when}</span><div style="height:6px"></div><div>${escapeHTML(text||'')}</div>`;
+        msgs.appendChild(div);
+        msgs.scrollTop = msgs.scrollHeight;
+      });
+      activeListeners[id] = ref;
+
+      form.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const author = form.querySelector('input[name="author"]').value.trim() || 'Anon';
+        const message = form.querySelector('textarea[name="message"]').value.trim();
+        if(!message) return;
+        ref.push({ name: author, text: message, ts: Date.now() });
+        form.reset();
+      });
+    }
+
+    function escapeHTML(s){ return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    // --- Footer year ---
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // --- Contact & Subscribe handlers (unchanged) ---
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwx7gdGmuWYmoIRTRB9fmxXXdRjQiI_ngZ9X6s4re87wbqzRrSx5ozNK95PwBde-JDc/exec';
+    function showToast(title, message){
+      const t = document.createElement('div');
+      t.className = 'eb-toast';
+      t.innerHTML = `<b>${title}</b><div>${message}</div>`;
+      document.body.appendChild(t);
+      setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateY(6px)'; }, 2800);
+      setTimeout(()=> t.remove(), 3600);
+    }
+    document.getElementById('contact-form')?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const payload = {
+        name:   document.getElementById('name').value.trim(),
+        email:  document.getElementById('email2').value.trim(),
+        subject:'Website Contact',
+        message:document.getElementById('msg').value.trim()
+      };
+      if(!payload.name || !payload.email || !payload.message){
+        showToast('Missing info', 'Please fill out name, email, and message.'); return;
+      }
+      try{
+        await fetch(scriptURL, { method:'POST', mode:'no-cors', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+        e.target.reset();
+        showToast('Thanks for reaching out! 💌', 'We received your message and will get back to you soon.');
+      }catch(err){
+        console.error(err);
+        showToast('Error sending', 'Please try again in a moment.');
+      }
+    });
+    document.getElementById('subscribe')?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const emailEl = document.getElementById('email');
+      const email = (emailEl?.value || '').trim();
+      if(!email){ showToast('Missing email', 'Please enter a valid email.'); return; }
+      try{
+        await fetch(scriptURL, { method:'POST', mode:'no-cors', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ name:'', email, subject:'Newsletter Subscribe', message:'Subscribe me to Eigenbytes.' }) });
+        e.target.reset();
+        showToast('Subscribed! ✅', 'Welcome to Eigenbytes—check your inbox for updates soon.');
+      }catch(err){
+        console.error(err);
+        showToast('Subscribe failed', 'Please try again shortly.');
+      }
+    });
+
+    // --- PWA (optional)
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    }
+  </script>
+
+  <!-- EigenBot floating widget -->
+  <div id="chat-widget" style="position: fixed; bottom: 20px; right: 20px; width: 350px; box-shadow: 0 0 10px rgba(0,0,0,.2); border-radius: 10px; overflow: hidden; z-index:9999;">
+    <div id="chat-header" onclick="toggleChat()" style="background-color:#53B848;color:black;padding:12px;cursor:pointer;text-align:center;font-weight:bold;">
+      💬 Chat with EigenBot
+    </div>
+    <div id="chat-body" style="display:none; background:#fff; border:1px solid #ccc;">
+      <iframe
+        id="chat-frame"
+        src="https://ai-web-companion-jaydataiot.replit.app/"
+        frameborder="0"
+        width="100%"
+        height="400"
+        style="border:none;border-top:1px solid #ccc;">
+      </iframe>
+    </div>
+  </div>
+  <style>
+    .eb-toast{
+      position: fixed; inset:auto 20px 20px auto;
+      background: color-mix(in oklab, var(--panel, #111), white 3%);
+      color: var(--text, #fff);
+      border: 1px solid color-mix(in oklab, var(--text, #fff), transparent 90%);
+      border-radius: 12px; padding: .9rem 1.1rem; z-index: 99999;
+      box-shadow: 0 10px 30px hsl(220 50% 2% / .4);
+      max-width: min(92vw, 420px);
+      transition: opacity .3s ease, transform .3s ease;
+    }
+    .eb-toast b{ display:block; margin-bottom:.25rem }
+  </style>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About — Eigenbytes.blog</title>
+  <meta name="description" content="About Eigenbytes.blog — our mission, what we publish, how we work, and the people behind it." />
+  <meta name="color-scheme" content="light dark">
+
+  <!-- Evergreen & Ember palette (matches site) -->
+  <style>
+    :root{
+      --bg: hsl(165 20% 6%);
+      --panel: hsl(165 18% 9%);
+      --panel-2: hsl(165 18% 12%);
+      --text: hsl(150 25% 92%);
+      --muted: hsl(160 10% 65%);
+      --brand: hsl(160 70% 45%);
+      --brand-2: hsl(30 85% 55%);
+      --ring: color-mix(in oklab, var(--brand), white 28%);
+      --radius: 18px;
+      --shadow: 0 10px 30px hsl(165 50% 2% / .6);
+      --line: color-mix(in oklab, var(--text), transparent 90%);
+      --chip: color-mix(in oklab, var(--panel), white 4%);
+      --code: #0b0f14;
+      --maxw: 1100px;
+    }
+    :root[data-theme="light"]{
+      --bg: hsl(160 25% 97%);
+      --panel: #fff;
+      --panel-2: hsl(160 25% 95%);
+      --text: hsl(165 25% 10%);
+      --muted: hsl(165 12% 35%);
+      --ring: color-mix(in oklab, var(--brand), black 25%);
+      --line: color-mix(in oklab, var(--text), transparent 88%);
+      --chip: color-mix(in oklab, var(--panel), black 1%);
+      --code: #0b0f14;
+    }
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--brand), transparent 85%), transparent) no-repeat,
+        radial-gradient(1000px 500px at -10% 20%, color-mix(in oklab, var(--brand-2), transparent 85%), transparent) no-repeat,
+        var(--bg);
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center top;
+      color: var(--text);
+      font: 16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial;
+    }
+    a{ color: var(--brand); text-decoration: none }
+    a:hover{ text-decoration: underline }
+    .container{ width:min(var(--maxw), 92%); margin-inline:auto; padding-inline: 0 }
+    header.site{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:saturate(120%) blur(10px);
+      background: color-mix(in oklab, var(--bg), transparent 40%);
+      border-bottom:1px solid var(--line);
+    }
+    nav{ display:flex; align-items:center; gap:12px; padding:10px 0 }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:800 }
+    .brand .logo{
+      inline-size:36px; block-size:36px; display:grid; place-items:center; border-radius:12px;
+      background:linear-gradient(135deg, var(--brand), var(--brand-2));
+      color:#fff; box-shadow: var(--shadow); font-weight:900
+    }
+    .navlinks{ margin-left:auto; display:flex; gap:10px; flex-wrap:wrap }
+    .navlinks a{ padding:8px 12px; border-radius:999px; color:var(--text) }
+    .navlinks a:is(:hover,:focus){ background: color-mix(in oklab, var(--panel), white 3%) }
+
+    /* Hero */
+    .hero{ padding: clamp(42px, 8vw, 120px) 0 24px }
+    .hero-grid{ display:grid; gap:22px; grid-template-columns: 1.2fr 1fr; align-items:center }
+    .hero h1{ font-size: clamp(28px, 5vw, 56px); line-height:1.05; letter-spacing:-.02em; margin:0 0 6px }
+    .lead{ color:var(--muted); margin: 6px 0 0 }
+
+    .pill{
+      font-size:12px; padding:.28rem .6rem; border-radius:999px; font-weight:700;
+      background: color-mix(in oklab, var(--brand), white 78%);
+      color: color-mix(in oklab, var(--brand), black 20%);
+    }
+    .card{
+      background: color-mix(in oklab, var(--panel), transparent 0%);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    section{ padding: clamp(28px, 6vw, 64px) 0 }
+    h2{ margin:0 0 10px; font-size: clamp(22px, 3.2vw, 34px) }
+
+    .grid{ display:grid; gap:16px; grid-template-columns: repeat(12, 1fr) }
+    .g-4{ grid-column: span 4 } .g-6{ grid-column: span 6 }
+    .g-8{ grid-column: span 8 } .g-12{ grid-column: 1 / -1 }
+
+    .chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px }
+    .chip{ background:var(--chip); color:var(--text); padding:6px 10px; border-radius:999px; font-size:12px }
+
+    /* Staff list */
+    .team{ display:grid; gap:14px }
+    .person{
+      display:grid; gap:16px; grid-template-columns: 112px 1fr;
+      align-items:center; padding:14px; border:1px solid var(--line); border-radius:14px; background: var(--panel);
+    }
+    .person img{
+      width:112px; height:112px; object-fit:cover; border-radius:12px; display:block;
+      background: color-mix(in oklab, var(--panel-2), black 10%);
+      border:1px solid color-mix(in oklab, var(--text), transparent 88%);
+    }
+    .person h3{ margin:.1rem 0 .25rem; font-size: 18px; line-height:1.2 }
+    .person .title{ color:var(--muted); font-size:13px; margin-bottom:8px }
+    .person .links{ display:flex; gap:10px; flex-wrap:wrap; margin-top:8px }
+    .person .links a{ font-size:13px; color:var(--text); opacity:.9; text-decoration:none; border-bottom:1px dashed color-mix(in oklab, var(--text), transparent 60%) }
+    .person .links a:hover{ opacity:1; border-bottom-style: solid }
+
+    /* Values cards */
+    .values{ display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) }
+
+    figure{
+      margin:16px 0; background: var(--panel); border:1px solid var(--line);
+      border-radius:12px; padding:8px
+    }
+    figcaption{ font-size:12px; color:var(--muted); padding:6px 8px 4px }
+
+    /* Footer */
+    footer{
+      border-top:1px solid var(--line); color:var(--muted);
+      padding:24px 0 54px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .hero-grid{ grid-template-columns: 1fr }
+      .g-4, .g-6, .g-8{ grid-column: 1 / -1 }
+      .person{ grid-template-columns: 88px 1fr }
+      .person img{ width:88px; height:88px }
+      .navlinks{ display:none }
+    }
+  </style>
+</head>
+<body>
+  <header class="site">
+    <div class="container">
+      <nav aria-label="Primary">
+        <div class="brand">
+          <div class="logo">EB</div>
+          <span>Eigenbytes.blog</span>
+        </div>
+        <div class="navlinks" role="menubar">
+          <a role="menuitem" href="index.html">Home</a>
+          <a role="menuitem" href="index.html#blog">Blog</a>
+          <a role="menuitem" href="index.html#tutorials">Tutorials</a>
+          <a role="menuitem" href="index.html#videos">Videos</a>
+          <a role="menuitem" href="index.html#community">Community</a>
+          <a role="menuitem" aria-current="page" href="/more.html">About</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="card">
+          <span class="pill">About</span>
+          <h1>What is Eigenbytes?</h1>
+          <p class="lead">
+            Eigenbytes.blog is a practical hub for <strong>AI</strong>, <strong>Data Science</strong>, <strong>ML</strong>, and <strong>AI Security</strong>.
+            We publish plain-English paper breakdowns, hands-on tutorials, and curated videos—organized for beginners through researchers.
+          </p>
+          <div class="chips">
+            <span class="chip">Paper Reviews</span>
+            <span class="chip">Hands-on Guides</span>
+            <span class="chip">LLM Safety</span>
+            <span class="chip">Community</span>
+          </div>
+        </div>
+        <figure>
+          <img src="logo3.png" alt="Illustration of a research-to-production pipeline" style="width:100%; border-radius:12px; display:block">
+          <figcaption>Our mission: accelerate learning from cutting-edge research to production-ready practice.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- MISSION & WHAT WE PUBLISH -->
+    <section>
+      <div class="container grid">
+        <div class="g-8 card">
+          <h2>Mission</h2>
+          <p>
+            We distill frontier research into actionable insights and reproducible workflows. Our bias is toward
+            <em>building</em>: every post aims to help you ship something—faster, safer, and with a deeper understanding of why it works.
+          </p>
+          <ul>
+            <li><strong>Clarity:</strong> Jargon-lite explanations without dumbing things down.</li>
+            <li><strong>Rigor:</strong> Citations, experiments, and transparent assumptions.</li>
+            <li><strong>Security-first:</strong> Practical guardrails for modern AI systems.</li>
+          </ul>
+        </div>
+        <aside class="g-4 card">
+          <h3>What We Publish</h3>
+          <ul>
+            <li><strong>Paper Dives:</strong> digestible summaries + diagrams</li>
+            <li><strong>Tutorials:</strong> end-to-end guides with code & data</li>
+            <li><strong>Videos:</strong> curated talks and explainers</li>
+            <li><strong>Community:</strong> skill-tiered Q&A boards</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- VALUES -->
+    <section>
+      <div class="container">
+        <h2>Our Values</h2>
+        <div class="values">
+          <div class="card">
+            <h3 style="margin:.2rem 0">Learn by Shipping</h3>
+            <p>We turn concepts into working demos—so you can adapt them for your own stack.</p>
+          </div>
+          <div class="card">
+            <h3 style="margin:.2rem 0">Beginner-Safe, Expert-Tough</h3>
+            <p>Clear entry points with depth for advanced readers: we annotate tradeoffs and edge cases.</p>
+          </div>
+          <div class="card">
+            <h3 style="margin:.2rem 0">Security & Safety</h3>
+            <p>LLM policy firewalls, evals, PII hygiene, and abuse resistance are first-class topics—not afterthoughts.</p>
+          </div>
+          <div class="card">
+            <h3 style="margin:.2rem 0">Open & Friendly</h3>
+            <p>We encourage questions and celebrate learning out loud. No gatekeeping.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW WE WORK -->
+    <section>
+      <div class="container grid">
+        <div class="g-6 card">
+          <h2>How We Work</h2>
+          <ol>
+            <li><strong>Read broadly:</strong> conference papers, docs, and battle-tested blog posts.</li>
+            <li><strong>Prototype fast:</strong> minimal reproducible examples with diagrams.</li>
+            <li><strong>Stress test:</strong> edge cases, ablations, and safety checks.</li>
+            <li><strong>Document:</strong> what worked, what didn’t, and why.</li>
+          </ol>
+        </div>
+        <div class="g-6 card">
+          <h3 style="margin-top:0">Credits & Attributions</h3>
+          <p>We link to original papers, repos, and datasets. If we missed an attribution, <a href="/#contact">tell us</a> and we’ll fix it quickly.</p>
+          <p class="lead" style="margin-top:8px; color:var(--muted)">Want to contribute? Pitch a post, tutorial, or video curation idea.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAFF -->
+    <section>
+      <div class="container">
+        <h2>Staff</h2>
+        <p class="lead">A small team blending research literacy with production pragmatism.</p>
+        <div class="team" role="list">
+          <!-- Person 1 -->
+          <article class="person" role="listitem" itemscope itemtype="https://schema.org/Person">
+            <img src="profile.png" alt="Portrait of Jeffrey Young" itemprop="image" />
+            <div>
+              <h3 itemprop="name">Jeffrey Alan Young</h3>
+              <div class="title" itemprop="jobTitle">Editor-in-Chief • ML Engineer • Data Scientist • AI Security Specialist</div>
+              <p itemprop="description">
+                Oversees paper selection and editorial voice. Previously built recommendation systems and led MLOps rollouts at scale. Designs policy firewalls, red-teaming playbooks, and evaluation harnesses for safe deployment of generative systems.
+                Builds end-to-end guides from data lake to feature store, plus visualization & deployment tips for real projects.
+                Keeps our visuals crisp and consistent—from multi-modal KG diagrams to policy firewall infographics.
+              </p>
+              <div class="links">
+                <a href="mailto:jay.data.iot@gmail.com" itemprop="email">Email</a>
+                <a href="https://www.linkedin.com/in/saiot/" rel="noopener">LinkedIn</a>
+                <a href="https://github.com/agentic-opt-ai" rel="noopener">GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Person 2 -->
+          <article class="person" role="listitem" itemscope itemtype="https://schema.org/Person">
+            <img src="question_mark.svg" alt="Portrait of ?" itemprop="image" />
+            <div>
+              <h3 itemprop="name">Contact if interested</h3>
+              <div class="title" itemprop="jobTitle">Security Lead • LLM Safety</div>
+              <p itemprop="description">
+                Designs policy firewalls, red-teaming playbooks, and evaluation harnesses for safe deployment of generative systems.
+              </p>
+              <div class="links">
+                <a href="mailto:eigenbytes.com" itemprop="email">Email</a>
+                <a href="https://www.linkedin.com/in/saiot/" rel="noopener">LinkedIn</a>
+                <a href="https://github.com/agentic-opt-ai" rel="noopener">GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Person 3 -->
+          <article class="person" role="listitem" itemscope itemtype="https://schema.org/Person">
+            <img src="question_mark.svg" alt="Portrait of ?" itemprop="image" />
+            <div>
+              <h3 itemprop="name">Contact if interested</h3>
+              <div class="title" itemprop="jobTitle">Developer Advocate • Tutorials</div>
+              <p itemprop="description">
+                Builds end-to-end guides from data lake to feature store, plus visualization & deployment tips for real projects.
+              </p>
+              <div class="links">
+                <a href="mailto:eigenbytes@gmail.com" itemprop="email">Email</a>
+                <a href="https://www.linkedin.com/in/saiot/" rel="noopener">LinkedIn</a>
+                <a href="https://github.com/agentic-opt-ai" rel="noopener">GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Person 4 -->
+          <article class="person" role="listitem" itemscope itemtype="https://schema.org/Person">
+            <img src="question_mark.svg" alt="Portrait of ?" itemprop="image" />
+            <div>
+              <h3 itemprop="name">Contact if interested</h3>
+              <div class="title" itemprop="jobTitle">Design & Diagrams</div>
+              <p itemprop="description">
+                Keeps our visuals crisp and consistent—from multi-modal KG diagrams to policy firewall infographics.
+              </p>
+              <div class="links">
+                <a href="mailto:eigenbytes@gmail.com" itemprop="email">Email</a>
+                <a href="https://www.linkedin.com/in/saiot/" rel="noopener">LinkedIn</a>
+                <a href="https://github.com/agentic-opt-ai" rel="noopener">GitHub</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT / SUBSCRIBE -->
+    <section>
+      <div class="container grid">
+        <div class="g-8 card">
+          <h2>Contact</h2>
+          <p>Questions, corrections, or ideas? We’d love to hear from you.</p>
+          <ul>
+            <li><strong>Email:</strong> eigenbytes@gmail.com</li>
+            <li><strong>Twitter/X:</strong> <a href="#">@eigenbytes</a></li>
+            <li><strong>GitHub:</strong> <a href="#">/eigenbytes</a></li>
+          </ul>
+        </div>
+        <aside class="g-4 card">
+          <h3>Subscribe</h3>
+          <p>Join the newsletter for weekly paper dives and tutorials.</p>
+          <form onsubmit="event.preventDefault(); alert('Subscribed! Thank you.');">
+            <label class="sr-only" for="email">Email</label>
+            <input id="email" type="email" required placeholder="you@domain.com"
+                   style="width:90%; padding:.7rem .9rem; border-radius:12px; border:1px solid var(--line); background:var(--panel-2); color:var(--text)">
+            <div style="height:10px"></div>
+            <button class="btn" type="submit"
+                    style="display:inline-flex; gap:.6rem; align-items:center; border:1px solid var(--line);
+                           background:linear-gradient(180deg, color-mix(in oklab, var(--panel), white 4%), color-mix(in oklab, var(--panel-2), black 2%));
+                           padding:.6rem .95rem; border-radius:12px; color:var(--text); box-shadow: var(--shadow)">
+              Subscribe
+            </button>
+          </form>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap">
+      <small>© <span id="year"></span> Eigenbytes.blog. All rights reserved.</small>
+      <small><a href="#" style="color:inherit">Privacy</a> • <a href="#" style="color:inherit">Terms</a> • <a href="#" style="color:inherit">RSS</a></small>
+    </div>
+  </footer>
+
+  <script>
+    // Honor saved theme + footer year
+    (function(){
+      const saved = localStorage.getItem('theme');
+      if(saved) document.documentElement.dataset.theme = saved;
+      document.getElementById('year').textContent = new Date().getFullYear();
+    })();
+  </script>
+</body>
+</html>

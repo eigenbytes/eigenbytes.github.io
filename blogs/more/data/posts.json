@@ -1,0 +1,36 @@
+{
+  "blog": [
+    {
+      "title": "Vertical Federated Learning: Concepts, Advances, and Challenges.",
+      "date": "2024-07-27",
+      "tags": ["Data privacy", "feature-partitioned collaborative learning", "vertical federated learning"],
+      "img": "blogs/b1/logo.png",
+      "excerpt": "VFL lets organizations holding different features about the same users train a joint model without sharing raw data.",
+      "url": "/blogs/b1/b1.html"
+    },
+    {
+      "title": "Unifying Large Language Models and Knowledge Graphs: A Roadmap",
+      "date": "2024-07",
+      "tags": ["Natural language processing", "large language models", "generative pre-training", "knowledge graphs", "roadmap", "bidirectional reasoning"],
+      "img": "blogs/b2/logo.png",
+      "excerpt": "Why unify LLMs and KGs? LLMs are powerful but can hallucinate and hide knowledge in parameters; KGs are explicit and precise but incomplete and language-poor.",
+      "url": "/blogs/b2/b2.html"
+    },
+    {
+      "title": "Recommender Systems in the Era of Large Language Models (LLMs)",
+      "date": "2024-11",
+      "tags": ["Recommender systems", "large language models", "pre-training", "fine-tuning", "prompting", "in-context learning"],
+      "img": "blogs/b3/logo.png",
+      "excerpt": "With the prosperity of e-commerce and web applications, Recommender Systems (RecSys) have become an indispensable and important component, providing personalized suggestions that cater to user preferences.",
+      "url": "/blogs/b3/b3.html"
+    },
+    {
+      "title": "Multi-Modal Knowledge Graphs: Construction & Applications — A Practical Guide",
+      "date": "2024-02",
+      "tags": ["Multimodal knowledge graph", "survey", "symbol grounding"],
+      "img": "blogs/b4/logo.png",
+      "excerpt": "A Multi-Modal Knowledge Graph (MMKG) links traditional graph symbols (entities, relations, attributes) with non-text modalities.",
+      "url": "/blogs/b4/b4.html"
+    }
+  ]
+}

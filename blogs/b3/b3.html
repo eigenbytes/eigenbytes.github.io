@@ -1,0 +1,249 @@
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recommender Systems in the Era of LLMs — A Field Guide (with Diagrams)</title>
+  <meta name="description" content="A comprehensive, image-rich walkthrough of the 2024 IEEE TKDE survey on LLM-empowered recommender systems: representations, pre-training, fine-tuning, prompting, and open challenges." />
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0e1015" />
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <style>
+    :root{--bg:#0e1015;--bg-soft:#161a22;--text:#e7ecf3;--muted:#9fb0c3;--brand:#6ad0ff;--accent:#ff8b6a;--ok:#62d394;--warn:#ffcf5a;--danger:#ff6a8b;--chip:#222733;--line:#1f2633;--code:#0b0f14}
+    html[data-theme="light"]{--bg:#fff;--bg-soft:#f6f8fb;--text:#0a0b0e;--muted:#415264;--brand:#0052cc;--accent:#c23a00;--ok:#007a3d;--warn:#b36b00;--danger:#aa0033;--chip:#e9eef6;--line:#e5ebf5;--code:#0b0f14}
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"}
+    header{max-width:980px;margin:0 auto;padding:48px 20px 12px}
+    header h1{margin:0 0 10px;font-size:clamp(28px,3.6vw,44px);line-height:1.1;letter-spacing:.2px}
+    header p{margin:0;color:var(--muted)}
+    main{max-width:980px;margin:0 auto;padding:16px 20px 80px}
+    h2{margin-top:38px} h3{margin-top:26px}
+    a{color:var(--brand);text-decoration:none} a:hover{text-decoration:underline}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .chip{background:var(--chip);color:var(--text);padding:6px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
+    .toc{background:var(--bg-soft);border:1px dashed var(--line);border-radius:12px;padding:14px 16px}
+    .card{background:var(--bg-soft);border:1px solid var(--line);border-radius:14px;padding:16px}
+    .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+    figure{margin:22px 0;background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:8px}
+    figcaption{font-size:12px;color:var(--muted);padding:6px 8px 4px}
+    pre,code{background:var(--code);color:var(--text)} pre{padding:12px;border-radius:10px;overflow:auto}
+    .ref{color:var(--muted);font-size:13px}
+    .summary{background:linear-gradient(180deg,#111827,#0c121e);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+    .callout{border-left:4px solid var(--brand);background:#111723;border-radius:8px;padding:12px}
+    .legend{font-size:12px;color:var(--muted)}
+    hr{border:none;border-top:1px solid var(--line);margin:38px 0}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Recommender Systems in the Era of Large Language Models (LLMs)</h1>
+    <p class="muted">Based on the IEEE TKDE survey (Nov 2024): representations, training paradigms, prompting, evaluations, and what to build next.</p>
+    <div class="chips">
+      <span class="chip">RecSys</span><span class="chip">LLMs</span><span class="chip">Pre-train</span><span class="chip">Fine-tune</span><span class="chip">Prompting & ICL</span><span class="chip">Explainability</span>
+    </div>
+  </header>
+  <main>
+    <section class="summary">
+      <h2>TL;DR</h2>
+      <p><strong>LLMs are changing RecSys</strong> by (1) encoding rich <em>textual side information</em> and even user dialogues; (2) serving as <em>generalists</em> across tasks (top-K, rating, explanation, conversation) via pre-training/fine-tuning; and (3) enabling <em>reasoning-style</em> recommendations through prompting (ICL, CoT). The survey organizes progress around <strong>representations</strong> (ID vs text-enhanced), and three paradigms: <strong>pre-training</strong>, <strong>fine-tuning</strong>, and <strong>prompting</strong>, plus open challenges (generalization, data sparsity, trust, safety).</p>
+    </section>
+    <section class="toc">
+      <strong>On this page</strong>
+      <ol>
+        <li><a href="#why">Why LLMs for RecSys?</a></li>
+        <li><a href="#representations">User/Item Representations: ID vs Text-Enhanced</a></li>
+        <li><a href="#paradigms">Three Paradigms: Pre-Train, Fine-Tune, Prompt</a></li>
+        <li><a href="#patterns">Design Patterns & Diagrams</a></li>
+        <li><a href="#eval">Evaluation: What to Measure</a></li>
+        <li><a href="#challenges">Challenges & Risks</a></li>
+        <li><a href="#build">Build-Ready Checklists</a></li>
+        <li><a href="#reference">Reference</a></li>
+      </ol>
+    </section>
+
+    <section id="why">
+      <h2>1) Why LLMs for RecSys?</h2>
+      <p>Traditional DNN-based recommenders excel at interaction modeling (RNN/GNN/Transformer) but struggle with <em>text comprehension</em>, <em>generalization across tasks</em>, and <em>multi-step reasoning</em>. LLMs bring strong language understanding, transfer via in-context learning, and chain-of-thought reasoning—making them promising for conversational, explainable, and planning-style recommendations.</p>
+      <figure>
+        <!-- Inline SVG: Strengths & gaps -->
+        <svg viewBox="0 0 900 250" width="100%" height="auto" role="img" aria-label="Classic RecSys vs LLMs">
+          <defs><style>.p{fill:#1d2431;stroke:#2a3242;stroke-width:1.2;rx:12}.t{fill:#e7ecf3;font:12px system-ui}.ok{fill:#62d394}.warn{fill:#ff8b6a}</style></defs>
+          <rect class="p" x="20" y="20" width="400" height="200"/><text class="t" x="40" y="46">Classic RecSys (DNN)</text>
+          <circle class="ok" cx="50" cy="72" r="5"/><text class="t" x="65" y="76">User–item interactions (RNN/GNN)</text>
+          <circle class="warn" cx="50" cy="100" r="5"/><text class="t" x="65" y="104">Weaker text understanding</text>
+          <circle class="warn" cx="50" cy="128" r="5"/><text class="t" x="65" y="132">Task-specific design; limited transfer</text>
+          <rect class="p" x="480" y="20" width="400" height="200"/><text class="t" x="500" y="46">LLMs for RecSys</text>
+          <circle class="ok" cx="510" cy="72" r="5"/><text class="t" x="525" y="76">Rich text & instruction following</text>
+          <circle class="ok" cx="510" cy="100" r="5"/><text class="t" x="525" y="104">ICL & CoT for reasoning</text>
+          <circle class="warn" cx="510" cy="128" r="5"/><text class="t" x="525" y="132">Hallucinations / cost / latency</text>
+        </svg>
+        <figcaption>Motivation for LLM-empowered recommendation.</figcaption>
+      </figure>
+    </section>
+
+    <section id="representations">
+      <h2>2) User/Item Representations</h2>
+      <h3>2.1 ID-based</h3>
+      <p>Map users/items to special tokens or semantic IDs so LLMs learn from interaction sequences and prompts (e.g., P5 framework; semantic or hybrid indexing). Pros: simple, leverages interaction signals. Cons: sparse data, low semantics, vocab changes.</p>
+      <h3>2.2 Textual side-information-enhanced</h3>
+      <p>Encode item titles/descriptions and user reviews or profiles with LMs/LLMs; optionally discretize (VQ-style codes) or blend with graph/product knowledge. Pros: richer semantics, more robust in cold-start; Cons: over-reliance on text without structure.</p>
+      <figure>
+        <!-- Inline SVG: ID vs Text -->
+        <svg viewBox="0 0 900 210" width="100%" height="auto" role="img" aria-label="ID vs Text representations">
+          <defs><style>.b{fill:#1d2431;stroke:#2a3242;stroke-width:1.2;rx:12}.t{fill:#e7ecf3;font:12px system-ui}.hint{fill:#9fb0c3;font:11px system-ui}</style></defs>
+        <rect class="b" x="20" y="20" width="410" height="170"/><text class="t" x="40" y="46">ID-based</text><text class="hint" x="40" y="66">“&lt;user_42&gt; → &lt;item_6637&gt;”</text>
+        <rect class="b" x="470" y="20" width="410" height="170"/><text class="t" x="490" y="46">Text-enhanced</text><text class="hint" x="490" y="66">titles, descriptions, reviews → encoder</text>
+        </svg>
+        <figcaption>Two representation families commonly used in LLM-Rec.</figcaption>
+      </figure>
+    </section>
+
+    <section id="paradigms">
+      <h2>3) Three Paradigms</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Pre-training</h3>
+          <p>LLMs pre-trained with MLM/NTP objectives; in RecSys, additional objectives can emphasize entity/behavior semantics before downstream tuning. Useful for universal item/user encoders and modality fusion.</p>
+        </div>
+        <div class="card">
+          <h3>Fine-tuning</h3>
+          <p>Supervised or instruction tuning on recommendation datasets/tasks (top-K, rating, explanation, dialog). Aligns model with platform-specific taxonomies, policies, and tone.</p>
+        </div>
+        <div class="card">
+          <h3>Prompting</h3>
+          <p>Zero/ few-shot with in-context examples; chain-of-thought for multi-step planning; tool-use (retrievers, knowledge graphs) to ground and reduce hallucinations—especially in conversational RecSys.</p>
+        </div>
+      </div>
+      <figure>
+        <!-- Inline SVG: Triangle of paradigms -->
+        <svg viewBox="0 0 900 260" width="100%" height="auto" role="img" aria-label="Pre-train, Fine-tune, Prompt triangle">
+          <defs><style>.t{fill:#e7ecf3;font:12px system-ui}.node{fill:#1d2431;stroke:#2a3242;stroke-width:1.2;rx:12}.edge{stroke:#6ad0ff;stroke-width:2}</style></defs>
+          <polygon points="450,30 820,210 80,210" fill="#141b27" stroke="#2a3242" stroke-width="1.2"/>
+          <rect class="node" x="430" y="10" width="120" height="40"/><text class="t" x="455" y="35">Pre-train</text>
+          <rect class="node" x="50" y="200" width="140" height="40"/><text class="t" x="85" y="225">Prompt</text>
+          <rect class="node" x="740" y="200" width="120" height="40"/><text class="t" x="760" y="225">Fine-tune</text>
+          <line class="edge" x1="490" y1="50" x2="120" y2="200"/><line class="edge" x1="490" y1="50" x2="800" y2="200"/><line class="edge" x1="180" y1="220" x2="740" y2="220"/>
+        </svg>
+        <figcaption>Pick one—or blend two—for your product maturity and data budget.</figcaption>
+      </figure>
+    </section>
+
+    <section id="patterns">
+      <h2>4) Design Patterns & Example Workflows</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Conversational reranking</h3>
+          <p>Classic RecSys proposes candidates; an LLM agent interviews the user, refines constraints, and reranks with rationales (e.g., movies, travel).</p>
+        </div>
+        <div class="card">
+          <h3>Unified task interface</h3>
+          <p>“Text-to-Rec” format (P5-style): cast rating, top-K, and explanation as text generation; use consistent prompts + special tokens/IDs.</p>
+        </div>
+        <div class="card">
+          <h3>Text-centric CF</h3>
+          <p>Leverage LLMs for text-based collaborative filtering and zero-shot item/user embeddings; mix with vector-quantized codes for efficiency.</p>
+        </div>
+      </div>
+
+      <figure>
+        <!-- Inline SVG: End-to-end pipeline -->
+        <svg viewBox="0 0 900 280" width="100%" height="auto" role="img" aria-label="LLM-Rec pipeline">
+          <defs><style>.box{fill:#1c2330;stroke:#2a3242;stroke-width:1.2;rx:12}.t{fill:#e7ecf3;font:12px system-ui}.arrow{stroke:#6ad0ff;stroke-width:2;marker-end:url(#m)}</style>
+            <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#6ad0ff"/></marker>
+          </defs>
+          <rect class="box" x="30" y="40" width="190" height="70"/><text class="t" x="45" y="70">Text & Interactions</text>
+          <rect class="box" x="260" y="40" width="190" height="70"/><text class="t" x="300" y="70">Encoder (LLM)</text>
+          <rect class="box" x="490" y="40" width="160" height="70"/><text class="t" x="520" y="70">Ranker/Scorer</text>
+          <rect class="box" x="690" y="40" width="180" height="70"/><text class="t" x="725" y="70">LLM Explainer / Dialog</text>
+          <line class="arrow" x1="220" y1="75" x2="260" y2="75"/><line class="arrow" x1="450" y1="75" x2="490" y2="75"/><line class="arrow" x1="650" y1="75" x2="690" y2="75"/>
+          <text class="t" x="80" y="125">titles, desc, reviews, chat</text>
+        </svg>
+        <figcaption>One pragmatic architecture: LLM encodes text, classic ranker scores, LLM explains/converses.</figcaption>
+      </figure>
+
+      <div class="callout">
+        <strong>Tip:</strong> If your domain knowledge is structured (catalog attributes, product graphs), consider LLM + KG synergy for factual grounding and explainability.
+      </div>
+    </section>
+
+    <section id="eval">
+      <h2>5) Evaluation: What to Measure</h2>
+      <ul>
+        <li><strong>Accuracy:</strong> Hit@K / NDCG / MAP for retrieval & ranking; RMSE/MAE for rating.</li>
+        <li><strong>Conversational quality:</strong> success rate, turn count, user satisfaction; constraint satisfaction.</li>
+        <li><strong>Explanations:</strong> faithfulness to features/paths; helpfulness (human eval).</li>
+        <li><strong>Generalization:</strong> zero-/few-shot across tasks and domains (ICL efficacy).</li>
+        <li><strong>Efficiency:</strong> latency, context length, retrieval cost; memory footprint with long catalogs.</li>
+      </ul>
+    </section>
+
+    <section id="challenges">
+      <h2>6) Open Challenges & Risks</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Data sparsity & cold start</h3>
+          <p>Text helps—but long-tail items/users still need augmentation (reviews, attributes, KG links) and transfer learning.</p>
+        </div>
+        <div class="card">
+          <h3>Hallucination & trust</h3>
+          <p>Unfounded explanations can mislead. Retrieval grounding (docs/KGs), constrained decoding, and trace logging are essential.</p>
+        </div>
+        <div class="card">
+          <h3>Cost/latency</h3>
+          <p>Instruction-tuned smaller LMs + LLM “judge/explainer” pattern often beats monolithic end-to-end generation at scale.</p>
+        </div>
+        <div class="card">
+          <h3>Fairness & safety</h3>
+          <p>Audit for demographic skews in text/reviews; add policy filters and counterfactual testing for conversational recommenders.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="build">
+      <h2>7) Build-Ready Checklists</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Representations</h3>
+          <ul>
+            <li>Start text-enhanced (titles, attributes, reviews); add IDs for legacy signals.</li>
+            <li>For huge catalogs, explore vector-quantized item codes + ANN retrieval.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Training strategy</h3>
+          <ul>
+            <li>Warm-start encoders with public LM/LLM; optionally add RecSys-specific pre-training tasks.</li>
+            <li>Instruction-tune for your tasks (top-K, rating, dialog, explanation).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Prompting system</h3>
+          <ul>
+            <li>Use ICL with diverse, up-to-date examples; add CoT where multi-step preferences exist (e.g., travel planning).</li>
+            <li>Guardrails: schema-aware prompts, grounding (search/KG), and output validators.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Ops</h3>
+          <ul>
+            <li>Measure end-to-end CTR/CVR uplift and explanation helpfulness via A/B tests.</li>
+            <li>Log prompts/retrievals for audits; version models and catalogs.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <hr />
+
+    <section id="reference">
+      <h2>Reference</h2>
+      <p>Zhao, Z., Fan, W., Li, J., et al. <em>Recommender Systems in the Era of Large Language Models (LLMs)</em>. IEEE TKDE, 36(11), 2024.</p>
+      <p>Pan, S., Luo, L., Wang, Y., et al. <em>Unifying Large Language Models and Knowledge Graphs: A Roadmap</em>. IEEE TKDE, 36(7), 2024.</p>
+    </section>
+  </main>
+  <footer>
+    <div style="padding:40px 20px;color:var(--muted)">© Eigenbytes.blog — AI • Data Science • ML • AI Security</div>
+  </footer>
+</body>
+</html>
+

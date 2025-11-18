@@ -1,0 +1,241 @@
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>First Lesson for Data Scientists: Question → EDA → Baseline</title>
+<meta name="description" content="A step-by-step, visual tutorial for your very first data science project: frame the question, explore the data, avoid leakage, split properly, build a simple baseline, and document learnings." />
+<meta name="color-scheme" content="light dark">
+<!-- Minimal post theme (works with Eigenbytes palette) -->
+<style>
+:root{
+  --bg: hsl(165 20% 6%); --panel: hsl(165 18% 9%); --panel-2: hsl(165 18% 12%);
+  --text: hsl(150 25% 92%); --muted: hsl(160 10% 65%);
+  --brand: hsl(160 70% 45%); --brand-2: hsl(30 85% 55%);
+  --ring: color-mix(in oklab, var(--brand), white 28%);
+  --radius: 18px; --shadow: 0 10px 30px hsl(165 50% 2% / .6);
+  --chip: color-mix(in oklab, var(--panel), white 4%); --line: color-mix(in oklab, var(--text), transparent 90%); --code:#0b0f14;
+}
+:root[data-theme="light"]{
+  --bg: hsl(160 25% 97%); --panel:#fff; --panel-2:hsl(160 25% 95%);
+  --text: hsl(165 25% 10%); --muted: hsl(165 12% 35%);
+  --ring: color-mix(in oklab, var(--brand), black 25%); --chip: color-mix(in oklab, var(--panel), black 1%); --line: color-mix(in oklab, var(--text), transparent 88%); --code:#0b0f14;
+}
+body{
+  margin:0; background:
+  radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--brand), transparent 85%), transparent),
+  radial-gradient(1000px 500px at -10% 20%, color-mix(in oklab, var(--brand-2), transparent 85%), transparent),
+  var(--bg); color:var(--text); font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+}
+article.container{ max-width:980px; margin:0 auto; padding:28px 20px 64px }
+h1{ font-size:clamp(28px,3.6vw,44px); line-height:1.1; margin:.6rem 0 }
+h2{ margin-top:34px } h3{ margin-top:22px }
+a{ color:var(--brand); text-decoration:none } a:hover{text-decoration:underline}
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow) }
+.summary{ background:linear-gradient(180deg, color-mix(in oklab, var(--panel), black 2%), color-mix(in oklab, var(--panel-2), black 1%)); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin:14px 0 18px }
+.grid{ display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)) }
+.chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px }
+.chip{ background:var(--chip); padding:6px 10px; border-radius:999px; font-size:12px }
+.pill{ font-size:12px; padding:.25rem .55rem; border-radius:999px; background: color-mix(in oklab, var(--brand), white 78%); color: color-mix(in oklab, var(--brand), black 20%); font-weight:700 }
+.meta,.legend{ color:var(--muted); font-size:13px }
+figure{ margin:20px 0; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:8px }
+figcaption{ color:var(--muted); font-size:12px; padding:6px 8px 4px }
+pre,code{ background:var(--code); color:var(--text) } pre{ padding:12px; border-radius:10px; overflow:auto }
+.btn{ display:inline-flex; gap:.5rem; align-items:center; border:1px solid var(--line); background:linear-gradient(180deg, color-mix(in oklab, var(--panel), white 4%), color-mix(in oklab, var(--panel-2), black 2%)); padding:.55rem .9rem; border-radius:12px; color:var(--text) }
+.callout{ border-left:4px solid var(--brand); background:color-mix(in oklab, var(--panel), white 3%); border-radius:10px; padding:12px; margin:12px 0 }
+hr{ border:none; border-top:1px solid var(--line); margin:34px 0 }
+</style>
+</head>
+<body>
+<article class="container">
+<header>
+  <span class="pill">Lesson 1 • Hands-on Tutorial</span>
+  <h1>From Question to Baseline: the First Lesson in Data Science</h1>
+  <p class="meta">You’ll frame a problem, explore data safely, avoid leakage, build a simple baseline, and note what to try next.</p>
+  <div class="chips">
+    <span class="chip">EDA</span><span class="chip">Data Splits</span><span class="chip">Leakage</span><span class="chip">Baseline</span><span class="chip">Evaluation</span>
+  </div>
+</header>
+<section class="summary">
+  <strong>TL;DR.</strong> Start simple and reproducible: (1) clarify the question, (2) explore data, (3) split properly to avoid leakage, (4) train a baseline, (5) evaluate and write down learnings. Iterate from there.
+  <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap">
+    <a class="btn" href="sandbox:/mnt/data/ds_first_lesson_tiny.csv" download>Download dataset (CSV)</a>
+    <a class="btn" href="sandbox:/mnt/data/first_lesson_ds_starter.ipynb" download>Download starter notebook (IPYNB)</a>
+  </div>
+</section>
+<!-- DIAGRAM: end-to-end flow -->
+<figure>
+  <svg viewBox="0 0 1100 210" width="100%" height="auto" role="img" aria-label="Question → Data → EDA → Split → Baseline → Evaluate">
+    <defs>
+      <style>
+        .box{fill:color-mix(in oklab, hsl(165,18%,12%), white 4%);stroke:color-mix(in oklab, white, transparent 90%);stroke-width:1.2;rx:12}
+        .txt{font:14px system-ui;fill:hsl(150,25%,92%)}
+        .arrow{fill:none;stroke:hsl(160,70%,45%);stroke-width:2.2;marker-end:url(#m)}
+      </style>
+      <marker id="m" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <polygon points="0 0, 6 3, 0 6" fill="hsl(160,70%,45%)"/>
+      </marker>
+    </defs>
+    <rect x="20"  y="60" width="150" height="80" class="box"/><text class="txt" x="45" y="105">Question</text>
+    <rect x="200" y="60" width="150" height="80" class="box"/><text class="txt" x="245" y="105">Data</text>
+    <rect x="380" y="60" width="150" height="80" class="box"/><text class="txt" x="430" y="105">EDA</text>
+    <rect x="560" y="60" width="150" height="80" class="box"/><text class="txt" x="605" y="105">Split</text>
+    <rect x="740" y="60" width="150" height="80" class="box"/><text class="txt" x="770" y="105">Baseline</text>
+    <rect x="920" y="60" width="160" height="80" class="box"/><text class="txt" x="955" y="105">Evaluate</text>
+    <path d="M170 100 L200 100" class="arrow"/><path d="M350 100 L380 100" class="arrow"/>
+    <path d="M530 100 L560 100" class="arrow"/><path d="M710 100 L740 100" class="arrow"/>
+    <path d="M890 100 L920 100" class="arrow"/>
+  </svg>
+  <figcaption>The minimal, reproducible path for any new dataset.</figcaption>
+</figure>
+<section>
+  <h2>Step 0 — Setup</h2>
+  <p>Install the basics (once):</p>
+  <pre><code># Terminal
+python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install pandas numpy scikit-learn matplotlib notebook
+jupyter notebook
+</code></pre>
+  <div class="callout"><strong>Tip:</strong> Create a project folder with subfolders: <code>data/</code>, <code>notebooks/</code>, <code>reports/</code>. Keep raw data immutable in <code>data/raw/</code>.</div>
+</section>
+<section>
+  <h2>Step 1 — Frame the Question</h2>
+  <p>Write a one-liner in your README/notebook:</p>
+  <ul>
+    <li><strong>Objective:</strong> Predict customer <em>churn</em> next month.</li>
+    <li><strong>Unit of prediction:</strong> Customer-month.</li>
+    <li><strong>Features available at prediction time:</strong> Activity in months 1..N (no future data).</li>
+    <li><strong>Metric:</strong> F1 or ROC AUC, depending on costs.</li>
+  </ul>
+</section>
+<section>
+  <h2>Step 2 — Load & Inspect the Data (EDA)</h2>
+  <p>Use the provided CSV (synthetic churn-like) or your own dataset.</p>
+  <pre><code>import pandas as pd
+df = pd.read_csv("ds_first_lesson_tiny.csv")
+df.head()</code></pre>
+  <div class="grid">
+    <div class="card">
+      <h3>2.1 Size & schema</h3>
+      <pre><code>df.shape, df.dtypes
+df.info()</code></pre>
+    </div>
+    <div class="card">
+      <h3>2.2 Missingness & stats</h3>
+      <pre><code>df.isna().sum()
+df.describe(include="all")</code></pre>
+    </div>
+    <div class="card">
+      <h3>2.3 Quick visuals</h3>
+      <pre><code>import matplotlib.pyplot as plt
+for col in ["months_active","avg_sessions","avg_spend"]:
+    df[col].hist(bins=20); plt.title(col); plt.show()</code></pre>
+    </div>
+  </div>
+  <!-- DIAGRAM: tidy data -->
+  <figure>
+    <svg viewBox="0 0 1100 240" width="100%" height="auto" role="img" aria-label="Tidy data">
+      <defs><style>.t{font:14px system-ui;fill:hsl(150,25%,92%)} .g{fill:color-mix(in oklab, hsl(165,18%,12%), white 3%);stroke:color-mix(in oklab, white, transparent 90%);stroke-width:1.2}</style></defs>
+      <rect x="20" y="40" width="1060" height="160" rx="12" class="g"/>
+      <text x="40" y="70" class="t" style="font-weight:700">Tidy data rule</text>
+      <text x="40" y="100" class="t">• Each row = one observation</text>
+      <text x="40" y="125" class="t">• Each column = one variable</text>
+      <text x="40" y="150" class="t">• Each cell = one value</text>
+    </svg>
+    <figcaption>Keep your data rectangular and explicit. It simplifies everything else.</figcaption>
+  </figure>
+</section>
+<section>
+  <h2>Step 3 — Split Early to Avoid Leakage</h2>
+  <p>Split <em>before</em> imputing/encoding, so test statistics don’t bleed into training.</p>
+  <pre><code>from sklearn.model_selection import train_test_split
+train_df, test_df = train_test_split(df, test_size=0.2, random_state=42, stratify=df["churn"])
+train_df.shape, test_df.shape</code></pre>
+  <!-- DIAGRAM: leakage -->
+  <figure>
+    <svg viewBox="0 0 1100 180" width="100%" height="auto" role="img" aria-label="Data leakage trap">
+      <defs><style>.box{fill:color-mix(in oklab, hsl(165,18%,12%), white 5%);stroke:color-mix(in oklab, white, transparent 90%);stroke-width:1.2;rx:12} .t{font:14px system-ui;fill:hsl(150,25%,92%)} .warn{fill:hsl(30,85%,55%)} </style></defs>
+      <rect x="20" y="40" width="440" height="100" class="box"/><text x="40" y="85" class="t">Wrong: Impute/encode on full data → split</text>
+      <rect x="640" y="40" width="440" height="100" class="box"/><text x="660" y="85" class="t">Right: Split → fit transformers on train → transform test</text>
+      <circle cx="570" cy="90" r="18" class="warn"/><text x="563" y="95" class="t" style="font-weight:700">!</text>
+    </svg>
+    <figcaption>Leakage sneaks in when you peek at the test set during preprocessing.</figcaption>
+  </figure>
+
+  <div class="card">
+    <h3>3.1 Impute & encode using train-only stats</h3>
+    <pre><code># Numeric imputation with train means
+num = ["months_active","avg_sessions","avg_spend"]
+train_imp = train_df.copy(); test_imp = test_df.copy()
+train_imp[num] = train_imp[num].fillna(train_imp[num].mean())
+test_imp[num]  = test_imp[num].fillna(train_imp[num].mean())
+  </div>
+</section>
+
+<section>
+  <h2>Step 4 — Train a Simple Baseline</h2>
+  <p>Start with something boring and strong (logistic regression for classification, linear regression for regression):</p>
+  <pre><code>from sklearn.linear_model import LogisticRegression
+clf = LogisticRegression(max_iter=1000)
+clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)</code></pre>
+  <div class="grid">
+    <div class="card">
+      <h3>4.1 Evaluate</h3>
+      <pre><code>from sklearn.metrics import classification_report, ConfusionMatrixDisplay
+print(classification_report(y_test, y_pred))
+ConfusionMatrixDisplay.from_predictions(y_test, y_pred)</code></pre>
+      <p class="legend">Pick a primary metric aligned with costs; keep others as guardrails.</p>
+    </div>
+    <div class="card">
+      <h3>4.2 Document</h3>
+      <ul>
+        <li>Assumptions and data quality issues</li>
+        <li>What features mattered? Where did errors cluster?</li>
+        <li>Concrete next steps (2–3 tests max)</li>
+      </ul>
+    </div>
+  </div>
+  <!-- DIAGRAM: train/val/test bar -->
+  <figure>
+    <svg viewBox="0 0 1100 160" width="100%" height="auto" role="img" aria-label="Train/Validation/Test split">
+      <defs><style>.t{font:14px system-ui;fill:hsl(150,25%,92%)} .tr{fill:color-mix(in oklab, hsl(160,70%,45%), black 35%)} .va{fill:color-mix(in oklab, hsl(30,85%,55%), black 35%)} .te{fill:color-mix(in oklab, white, black 70%)}</style></defs>
+      <rect x="20" y="60" width="740" height="40" class="tr"/><text x="24" y="88" class="t">Train (~70–80%)</text>
+      <rect x="770" y="60" width="160" height="40" class="va"/><text x="774" y="88" class="t">Val (~10–15%)</text>
+      <rect x="930" y="60" width="160" height="40" class="te"/><text x="934" y="88" class="t">Test (~10–15%)</text>
+    </svg>
+    <figcaption>Keep a clean test set for the very end; use validation for iteration.</figcaption>
+  </figure>
+</section>
+<section>
+  <h2>Step 5 — Next Experiments</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Features</h3>
+      <ul><li>Ratios (spend per session)</li><li>Bucketing months_active</li><li>Recency features</li></ul>
+    </div>
+    <div class="card">
+      <h3>Models</h3>
+      <ul><li>Regularization (C)</li><li>Tree ensembles</li><li>Calibrated probabilities</li></ul>
+    </div>
+    <div class="card">
+      <h3>Evaluation</h3>
+      <ul><li>Stratified CV</li><li>Cost-sensitive metrics</li><li>Error analysis by segment</li></ul>
+    </div>
+  </div>
+</section>
+<hr/>
+<section>
+  <h2>Downloadables</h2>
+  <ul>
+    <li><a href="misc/ds_first_lesson_tiny.csv" download>Dataset (CSV)</a></li>
+    <li><a href="misc/first_lesson_ds_starter.ipynb" download>Starter Notebook (IPYNB)</a></li>
+  </ul>
+</section>
+
+</article>
+<script>
+  // Honor site-wide saved theme if opened outside main shell
+  (function(){ const saved = localStorage.getItem('theme'); if(saved) document.documentElement.dataset.theme = saved; })();
+</script>
+</body>
+</html> |oai:code-citation|

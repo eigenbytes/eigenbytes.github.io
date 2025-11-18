@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>More Tutorials — Eigenbytes</title>
+  <meta name="description" content="Hands-on tutorials for AI, Data Science, ML, and AI Security — with code, datasets, and walkthroughs." />
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0e1015" />
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+
+  <style>
+    /* ===== Evergreen & Ember palette (same tokens) ===== */
+    :root{
+      --bg: hsl(165 20% 6%);
+      --panel: hsl(165 18% 9%);
+      --panel-2: hsl(165 18% 12%);
+      --text: hsl(150 25% 92%);
+      --muted: hsl(160 10% 65%);
+      --brand: hsl(160 70% 45%);
+      --brand-2: hsl(30 85% 55%);
+      --ring: color-mix(in oklab, var(--brand), white 28%);
+      --radius: 18px;
+      --shadow: 0 10px 30px hsl(165 50% 2% / .6);
+    }
+    :root[data-theme="light"]{
+      --bg: hsl(160 25% 97%);
+      --panel: hsl(0 0% 100%);
+      --panel-2: hsl(160 25% 95%);
+      --text: hsl(165 25% 10%);
+      --muted: hsl(165 12% 35%);
+      --ring: color-mix(in oklab, var(--brand), black 25%);
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg: hsl(160 25% 97%);
+        --panel: hsl(0 0% 100%);
+        --panel-2: hsl(160 25% 95%);
+        --text: hsl(165 25% 10%);
+        --muted: hsl(165 12% 35%);
+        --ring: color-mix(in oklab, var(--brand), black 25%);
+      }
+    }
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0;
+      font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--brand), transparent 85%), transparent) no-repeat,
+        radial-gradient(1000px 500px at -10% 20%, color-mix(in oklab, var(--brand-2), transparent 85%), transparent) no-repeat,
+        var(--bg);
+      background-repeat:no-repeat; background-size:cover; background-position:center top;
+      color:var(--text); accent-color:var(--brand); scroll-behavior:smooth;
+    }
+    .container{ width:min(1200px,92%); margin-inline:auto }
+
+    header.site{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:saturate(120%) blur(10px);
+      background: color-mix(in oklab, var(--bg), transparent 40%);
+      border-bottom:1px solid color-mix(in oklab, var(--text), transparent 90%);
+    }
+    nav{ display:flex; align-items:center; gap:12px; padding:10px 0 }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:800 }
+    .brand .logo{
+      inline-size:36px; block-size:36px; display:grid; place-items:center; border-radius:12px;
+      background:linear-gradient(135deg,var(--brand),var(--brand-2)); color:white; box-shadow:var(--shadow); font-weight:900
+    }
+    .navlinks{ margin-left:auto; display:flex; flex-wrap:wrap; gap:8px }
+    .navlinks a{ padding:8px 12px; border-radius:999px; text-decoration:none; color:var(--text); opacity:.9 }
+    .navlinks a:is(:hover,:focus){ background:color-mix(in oklab, var(--panel), white 3%); outline:none }
+
+    .btn{
+      display:inline-flex; gap:.6rem; align-items:center;
+      border:1px solid color-mix(in oklab, var(--text), transparent 85%);
+      background:linear-gradient(180deg,
+        color-mix(in oklab, var(--panel), white 4%),
+        color-mix(in oklab, var(--panel-2), black 2%)
+      );
+      padding:.6rem .95rem; border-radius:12px; text-decoration:none; color:var(--text); box-shadow:var(--shadow);
+      cursor:pointer;
+    }
+    .btn:hover{ transform:translateY(-1px) }
+    .btn:is(:focus-visible){ outline:2px solid var(--ring); outline-offset:2px }
+
+    .hero{ padding: clamp(36px, 6vw, 72px) 0 }
+    .hero h1{ margin:0 0 6px; font-size:clamp(28px,5vw,48px); line-height:1.05; letter-spacing:-.02em }
+    .lead{ color:var(--muted) }
+
+    .card{
+      background: color-mix(in oklab, var(--panel), transparent 0%);
+      border:1px solid color-mix(in oklab, var(--text), transparent 90%);
+      border-radius: var(--radius); padding:20px; box-shadow: var(--shadow)
+    }
+    .pill{
+      font-size:12px; padding:.25rem .55rem; border-radius:999px;
+      background: color-mix(in oklab, var(--brand), white 78%);
+      color: color-mix(in oklab, var(--brand), black 20%); font-weight:700
+    }
+
+    section{ padding: clamp(28px, 5vw, 56px) 0 }
+    .filters{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:12px 0 }
+    .filters input[type="search"]{
+      padding:.55rem .8rem; border-radius:10px;
+      border:1px solid color-mix(in oklab, var(--text), transparent 88%);
+      background:var(--panel); color:var(--text)
+    }
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap }
+    .tabs button{
+      border:1px solid color-mix(in oklab, var(--text), transparent 85%);
+      background:var(--panel); padding:.45rem .8rem; border-radius:10px; color:var(--text); cursor:pointer
+    }
+    .tabs button[aria-selected="true"]{
+      outline:2px solid var(--ring);
+      background: color-mix(in oklab, var(--panel), white 3%)
+    }
+    select.sort {
+      border:1px solid color-mix(in oklab, var(--text), transparent 85%);
+      background:var(--panel); color:var(--text); border-radius:10px; padding:.45rem .6rem;
+    }
+
+    .grid{
+      display:grid; gap:16px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+    .tutorial{ display:flex; flex-direction:column; gap:10px }
+    .tutorial img{
+      width:100%; height:160px; object-fit:cover; border-radius:12px;
+      border:1px solid color-mix(in oklab, var(--text), transparent 90%);
+    }
+    .tutorial .meta{ color:var(--muted); font-size:.9rem; display:flex; gap:8px; flex-wrap:wrap }
+    .chip{
+      font-size:12px; padding:.2rem .5rem; border-radius:999px; border:1px solid color-mix(in oklab, var(--text), transparent 85%);
+      color:var(--muted)
+    }
+
+    footer{
+      border-top:1px solid color-mix(in oklab, var(--text), transparent 90%);
+      padding:20px 0 60px; color:var(--muted)
+    }
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0 }
+  </style>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to content</a>
+
+  <header class="site">
+    <div class="container">
+      <nav aria-label="Primary">
+        <div class="brand">
+          <a class="logo" href="/" aria-label="Eigenbytes Home">EB</a>
+          <span>Eigenbytes</span>
+        </div>
+        <div class="navlinks" role="menubar">
+          <a role="menuitem" href="/">Home</a>
+          <a role="menuitem" href="/#blog">Blog</a>
+          <a role="menuitem" href="/#tutorials">Tutorials</a>
+          <a role="menuitem" href="/#videos">Videos</a>
+          <a role="menuitem" href="/more.html">About</a>
+        </div>
+        <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
+          <input id="site-search" placeholder="Search tutorials…" aria-label="Search tutorials" />
+          <select id="sort" class="sort" aria-label="Sort tutorials">
+            <option value="date_desc">Newest</option>
+            <option value="date_asc">Oldest</option>
+            <option value="level_asc">Level: Beginner → Advanced</option>
+            <option value="level_desc">Level: Advanced → Beginner</option>
+            <option value="duration_asc">Shortest duration</option>
+            <option value="duration_desc">Longest duration</option>
+          </select>
+          <button id="theme-toggle" class="btn" aria-pressed="false" title="Toggle theme">🌓</button>
+          <a class="btn" href="/">⬅ Back</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container">
+        <span class="pill">Learn</span>
+        <h1>More Tutorials</h1>
+        <p class="lead">Deep dives and hands-on guides for practitioners — filter by topic, difficulty, format, and more.</p>
+
+        <div class="filters">
+          <div class="tabs" id="tag-bar" role="tablist" aria-label="Filter by topic"></div>
+          <div class="tabs" id="level-bar" role="tablist" aria-label="Filter by difficulty" style="margin-left:auto"></div>
+          <button class="btn" id="clear-filters" title="Clear filters">Clear</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <!-- Tutorials render here -->
+        <div id="tutorials-host" class="grid" aria-live="polite"></div>
+
+        <div style="display:flex; justify-content:center; margin-top:18px">
+          <button id="load-more" class="btn" style="display:none">Load more</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap">
+      <small>© <span id="year"></span> Eigenbytes.blog.</small>
+      <small><a href="/feed.xml" style="color:inherit">RSS</a></small>
+    </div>
+  </footer>
+
+  <!-- Tutorial card template -->
+  <template id="tutorial-card">
+    <article class="tutorial card" data-tags="" data-level="">
+      <img loading="lazy" src="" alt="">
+      <h3 style="margin:.2rem 0 .1rem"></h3>
+      <p class="excerpt" style="margin:0 0 .4rem"></p>
+      <div class="meta">
+        <span class="chip" data-role="level"></span>
+        <span class="chip" data-role="duration"></span>
+        <span class="chip" data-role="format"></span>
+        <span class="chip" data-role="updated"></span>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap">
+        <a class="btn" data-role="cta" href="#">Start Tutorial</a>
+        <a class="btn" data-role="code" href="#" style="display:none">Source Code</a>
+        <a class="btn" data-role="video" href="#" style="display:none">Video</a>
+      </div>
+    </article>
+  </template>
+
+  <script type="module">
+    // --- Theme toggle (same behavior) ---
+    const themeBtn = document.getElementById('theme-toggle');
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+    if(savedTheme) root.dataset.theme = savedTheme;
+    themeBtn?.addEventListener('click', ()=>{
+      const t = root.dataset.theme === 'light' ? 'dark' : 'light';
+      root.dataset.theme = t; localStorage.setItem('theme', t);
+      themeBtn.setAttribute('aria-pressed', String(t==='dark'));
+    });
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // --- Data load (expects data/tutorials.json) ---
+    /**
+     * Expected JSON shape:
+     * {
+     *   "tutorials":[
+     *     {
+     *       "title":"Build an RNN for Financial Time Series",
+     *       "excerpt":"Train, evaluate, and interpret an RNN on market data.",
+     *       "url":"/tutorials/rnn-finance.html",
+     *       "img":"/images/tutorials/rnn.jpg",
+     *       "date":"2025-10-21",
+     *       "updated":"2025-11-01",
+     *       "tags":["AI","RNN","Finance"],
+     *       "level":"Intermediate",         // Beginner | Intermediate | Advanced
+     *       "duration":"45 min",            // free text (e.g., "2 hrs", "45 min")
+     *       "format":"Article",             // Article | Notebook | Video | Mixed
+     *       "codeUrl":"https://github.com/…", // optional
+     *       "videoUrl":"https://youtu.be/…"    // optional
+     *     }
+     *   ]
+     * }
+     */
+    let tutorials = [];
+    try{
+      const res = await fetch('data/posts.json', { cache:'no-store' });
+      if(!res.ok) throw new Error(res.status);
+      const all = await res.json();
+      tutorials = (all.tutorials || []).slice();
+    }catch(e){
+      console.error('Failed to load tutorials.json', e);
+      tutorials = [];
+    }
+
+    // --- State ---
+    const state = { tag:'All', level:'All', q:'', page:1, pageSize:24, sort:'date_desc' };
+
+    // --- Build tag & level bars ---
+    const tagBar = document.getElementById('tag-bar');
+    const levelBar = document.getElementById('level-bar');
+    const levels = ['All','Beginner','Intermediate','Advanced'];
+
+    function buildTabs(host, items, selected, onClick){
+      host.innerHTML = '';
+      for(const it of items){
+        const b = document.createElement('button');
+        b.textContent = it; b.setAttribute('role','tab');
+        b.setAttribute('aria-selected', String(it===selected));
+        b.addEventListener('click',()=>{
+          host.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected','false'));
+          b.setAttribute('aria-selected','true'); onClick(it);
+        });
+        host.appendChild(b);
+      }
+    }
+
+    const tags = ['All', ...new Set(tutorials.flatMap(t => t.tags || []))].sort((a,b)=>{
+      if(a==='All') return -1; if(b==='All') return 1; return a.localeCompare(b);
+    });
+    buildTabs(tagBar, tags, state.tag, (t)=>{ state.tag=t; state.page=1; render(); });
+    buildTabs(levelBar, levels, state.level, (l)=>{ state.level=l; state.page=1; render(); });
+
+    document.getElementById('clear-filters').addEventListener('click', ()=>{
+      state.tag = 'All'; state.level='All'; state.q=''; state.page=1; state.sort='date_desc';
+      buildTabs(tagBar, tags, state.tag, (t)=>{ state.tag=t; state.page=1; render(); });
+      buildTabs(levelBar, levels, state.level, (l)=>{ state.level=l; state.page=1; render(); });
+      const s = document.getElementById('site-search'); if(s) s.value='';
+      const sel = document.getElementById('sort'); if(sel) sel.value='date_desc';
+      render();
+    });
+
+    // --- Search & sort wiring ---
+    const searchEl = document.getElementById('site-search');
+    searchEl?.addEventListener('input', ()=>{
+      state.q = searchEl.value.toLowerCase().trim();
+      state.page = 1; render();
+    });
+
+    const sortEl = document.getElementById('sort');
+    sortEl?.addEventListener('change', ()=>{
+      state.sort = sortEl.value; state.page=1; render();
+    });
+
+    // --- Helpers ---
+    const $tpl = document.getElementById('tutorial-card');
+
+    function matches(t){
+      const tagOk = state.tag==='All' || (t.tags||[]).includes(state.tag);
+      const levelOk = state.level==='All' || (t.level||'').toLowerCase() === state.level.toLowerCase();
+      const q = state.q;
+      if(!q) return tagOk && levelOk;
+      const hay = [t.title||'', t.excerpt||'', t.level||'', t.format||'', ...(t.tags||[])].join(' ').toLowerCase();
+      return tagOk && levelOk && hay.includes(q);
+    }
+
+    function sortItems(arr){
+      const byDate = (a,b)=> new Date(b.date||b.updated||0) - new Date(a.date||a.updated||0);
+      const byDateAsc = (a,b)=> -byDate(a,b);
+      const levelRank = { 'Beginner':1, 'Intermediate':2, 'Advanced':3 };
+      const byLevelAsc = (a,b)=> (levelRank[a.level]||9) - (levelRank[b.level]||9) || byDate(a,b);
+      const byLevelDesc = (a,b)=> (levelRank[b.level]||-9) - (levelRank[a.level]||-9) || byDate(a,b);
+      const durationToMin = v => {
+        if(!v) return 99999;
+        const m = v.toString().toLowerCase().match(/(\d+(?:\.\d+)?)\s*(h|hr|hrs|hour|hours|m|min|mins|minute|minutes)/);
+        if(!m) return 99999;
+        const n = parseFloat(m[1]); const u = m[2][0];
+        return u==='h' ? Math.round(n*60) : Math.round(n);
+      };
+      const byDurationAsc = (a,b)=> durationToMin(a.duration) - durationToMin(b.duration) || byDate(a,b);
+      const byDurationDesc = (a,b)=> durationToMin(b.duration) - durationToMin(a.duration) || byDate(a,b);
+
+      switch(state.sort){
+        case 'date_asc': return arr.sort(byDateAsc);
+        case 'level_asc': return arr.sort(byLevelAsc);
+        case 'level_desc': return arr.sort(byLevelDesc);
+        case 'duration_asc': return arr.sort(byDurationAsc);
+        case 'duration_desc': return arr.sort(byDurationDesc);
+        default: return arr.sort(byDate);
+      }
+    }
+
+    function renderCard(t){
+      const node = $tpl.content.cloneNode(true);
+      const img = node.querySelector('img');
+      img.src = t.img || '/images/tutorials/placeholder.jpg';
+      img.alt = t.title || 'Tutorial cover';
+
+      node.querySelector('h3').textContent = t.title || 'Untitled tutorial';
+      node.querySelector('.excerpt').textContent = t.excerpt || '';
+
+      node.querySelector('[data-role="level"]').textContent = t.level || 'Level N/A';
+      node.querySelector('[data-role="duration"]').textContent = t.duration || 'Duration N/A';
+      node.querySelector('[data-role="format"]').textContent = t.format || 'Format';
+      node.querySelector('[data-role="updated"]').textContent =
+        'Updated ' + (t.updated ? new Date(t.updated).toLocaleDateString() : new Date(t.date||Date.now()).toLocaleDateString());
+
+      const a = node.querySelector('[data-role="cta"]');
+      a.href = t.url || '#';
+      a.setAttribute('aria-label', `Start: ${t.title}`);
+
+      const code = node.querySelector('[data-role="code"]');
+      if(t.codeUrl){ code.href = t.codeUrl; code.style.display = 'inline-flex'; }
+
+      const vid = node.querySelector('[data-role="video"]');
+      if(t.videoUrl){ vid.href = t.videoUrl; vid.style.display = 'inline-flex'; }
+
+      const art = node.querySelector('.tutorial');
+      art.dataset.tags = (t.tags||[]).join(',');
+      art.dataset.level = t.level || '';
+
+      return node;
+    }
+
+    // --- Render ---
+    const host = document.getElementById('tutorials-host');
+    const loadMoreBtn = document.getElementById('load-more');
+
+    function render(){
+      host.innerHTML = '';
+      const filtered = tutorials.filter(matches);
+      const sorted = sortItems(filtered);
+      const paged = sorted.slice(0, state.page * state.pageSize);
+
+      for(const t of paged){
+        host.appendChild( renderCard(t) );
+      }
+
+      loadMoreBtn.style.display = paged.length < filtered.length ? 'inline-flex' : 'none';
+    }
+
+    loadMoreBtn.addEventListener('click', ()=>{
+      state.page += 1; render();
+      loadMoreBtn.scrollIntoView({ behavior:'smooth', block:'center' });
+    });
+
+    render();
+
+    // --- PWA optional ---
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    }
+  </script>
+</body>
+</html>

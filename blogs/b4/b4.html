@@ -1,0 +1,397 @@
+<!-- Eigenbytes.blog — Blog Post (drop into your post renderer; uses site-wide theme tokens) -->
+<article class="container" style="max-width: 980px; padding: 28px 0">
+	<meta charset="utf-8">
+	<header style="margin-bottom: 18px">
+	<span class="pill">Survey • MMKG</span>
+	<h1 style="margin: 10px 0 8px; font-size: clamp(28px,3.6vw,44px); line-height:1.1">
+	  Multi-Modal Knowledge Graphs: Construction & Applications — A Practical Guide
+	</h1>
+	<p class="meta">Understanding how to build and use Knowledge Graphs that see, read, and (eventually) listen.</p>
+	<div class="chips">
+	  <span class="chip">Knowledge Graphs</span>
+	  <span class="chip">Vision-Language</span>
+	  <span class="chip">Symbol Grounding</span>
+	  <span class="chip">Information Extraction</span>
+	</div>
+	<style>
+	/* === Eigenbytes Evergreen & Ember — Post Theme === */
+	:root{
+	  /* Dark (default) */
+	  --bg: hsl(165 20% 6%);
+	  --panel: hsl(165 18% 9%);
+	  --panel-2: hsl(165 18% 12%);
+	  --text: hsl(150 25% 92%);
+	  --muted: hsl(160 10% 65%);
+	  --brand: hsl(160 70% 45%);
+	  --brand-2: hsl(30 85% 55%);
+	  --ring: color-mix(in oklab, var(--brand), white 28%);
+	  --radius: 18px;
+	  --shadow: 0 10px 30px hsl(165 50% 2% / .6);
+
+	  /* Compat tokens older posts might expect */
+	  --bg-soft: var(--panel);
+	  --chip: color-mix(in oklab, var(--panel), white 4%);
+	  --line: color-mix(in oklab, var(--text), transparent 90%);
+	  --code: #0b0f14;
+	}
+
+	/* Light mode */
+	:root[data-theme="light"]{
+	  --bg: hsl(160 25% 97%);
+	  --panel: hsl(0 0% 100%);
+	  --panel-2: hsl(160 25% 95%);
+	  --text: hsl(165 25% 10%);
+	  --muted: hsl(165 12% 35%);
+	  --ring: color-mix(in oklab, var(--brand), black 25%);
+	  --chip: color-mix(in oklab, var(--panel), black 1%);
+	  --line: color-mix(in oklab, var(--text), transparent 88%);
+	  --code: #0b0f14;
+	}
+
+	/* Respect system preference if page is standalone (no site shell) */
+	@media (prefers-color-scheme: light){
+	  :root:not([data-theme="dark"]){
+	    --bg: hsl(160 25% 97%);
+	    --panel: hsl(0 0% 100%);
+	    --panel-2: hsl(160 25% 95%);
+	    --text: hsl(165 25% 10%);
+	    --muted: hsl(165 12% 35%);
+	    --ring: color-mix(in oklab, var(--brand), black 25%);
+	    --chip: color-mix(in oklab, var(--panel), black 1%);
+	    --line: color-mix(in oklab, var(--text), transparent 88%);
+	    --code: #0b0f14;
+	  }
+	}
+
+	/* Page base (safe even if your main shell already styles <body>) */
+	body{
+	  background:
+	    radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--brand), transparent 85%), transparent),
+	    radial-gradient(1000px 500px at -10% 20%, color-mix(in oklab, var(--brand-2), transparent 85%), transparent),
+	    var(--bg);
+	  color: var(--text);
+	}
+
+	/* Post container */
+	article.container{ max-width:980px; margin:0 auto; padding:28px 20px 64px }
+
+	/* Headings & links */
+	article h1{ font-size:clamp(28px,3.6vw,44px); line-height:1.1; margin:.6rem 0 }
+	article h2{ margin-top:38px }
+	article h3{ margin-top:26px }
+	article a{ color:var(--brand); text-decoration:none }
+	article a:hover{ text-decoration:underline }
+
+	/* Utility bits */
+	.pill{
+	  font-size:12px; padding:.25rem .55rem; border-radius:999px;
+	  background: color-mix(in oklab, var(--brand), white 78%);
+	  color: color-mix(in oklab, var(--brand), black 20%);
+	  font-weight:700
+	}
+	.chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px }
+	.chip{ background:var(--chip); color:var(--text); padding:6px 10px; border-radius:999px; font-size:12px }
+
+	.meta, .ref, .legend{ color:var(--muted); font-size:13px }
+
+	/* Cards & callouts */
+	.card{
+	  background: color-mix(in oklab, var(--panel), transparent 0%);
+	  border:1px solid var(--line);
+	  border-radius: var(--radius);
+	  padding:16px;
+	  box-shadow: var(--shadow);
+	}
+	.summary{
+	  background:linear-gradient(180deg, color-mix(in oklab, var(--panel), black 2%), color-mix(in oklab, var(--panel-2), black 1%));
+	  border:1px solid var(--line);
+	  border-radius:14px;
+	  padding:14px 16px;
+	  margin:14px 0 18px;
+	}
+	.callout{
+	  border-left:4px solid var(--brand);
+	  background: color-mix(in oklab, var(--panel), white 2%);
+	  border-radius:10px;
+	  padding:12px;
+	  margin:12px 0;
+	}
+
+	/* Grid for small cards */
+	.grid{ display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)) }
+
+	/* Figures */
+	figure{
+	  margin:22px 0;
+	  background: var(--panel);
+	  border:1px solid var(--line);
+	  border-radius:12px;
+	  padding:8px;
+	}
+	figcaption{ font-size:12px; color:var(--muted); padding:6px 8px 4px }
+
+	/* Table of contents block (if used) */
+	.toc{
+	  background: var(--panel);
+	  border:1px dashed var(--line);
+	  border-radius:12px;
+	  padding:14px 16px;
+	}
+
+	/* Code */
+	pre, code{ background: var(--code); color: var(--text) }
+	pre{ padding:12px; border-radius:10px; overflow:auto }
+
+	/* HR */
+	hr{ border:none; border-top:1px solid var(--line); margin:38px 0 }
+
+	/* Buttons inside the article */
+	.btn{
+	  display:inline-flex; gap:.6rem; align-items:center;
+	  border:1px solid var(--line);
+	  background:linear-gradient(180deg,
+	    color-mix(in oklab, var(--panel), white 4%),
+	    color-mix(in oklab, var(--panel-2), black 2%)
+	  );
+	  padding:.55rem .9rem; border-radius:12px; text-decoration:none; color:var(--text);
+	  box-shadow: var(--shadow);
+	}
+	.btn:hover{ transform: translateY(-1px) }
+	.btn:focus-visible{ outline:2px solid var(--ring); outline-offset:2px }
+	</style>
+	</header>
+	<!-- TL;DR -->
+	<section class="summary">
+		<strong>TL;DR.</strong> A Multi-Modal Knowledge Graph (MMKG) links traditional graph symbols (entities, relations, attributes) with non-text modalities (images today; audio/video tomorrow). You can build MMKGs in two complementary ways: (1) label images with KG symbols (“images → symbols”), or (2) ground KG symbols to images found on the web or in curated corpora (“symbols → images”). Both power in-graph tasks (link prediction, entity alignment) and out-of-graph tasks (VQA, captioning, cross-modal retrieval), while unlocking interpretability and long-tail coverage.
+	</section>
+	<!-- Figure 1: Two representations -->
+	<figure>
+	    <svg viewBox="0 0 1100 380" width="100%" height="auto" role="img" aria-label="Two ways to represent an MMKG: A-MMKG vs N-MMKG">
+		 	<defs>
+		        <style>
+					.b{fill:none;stroke:hsl(160,70%,45%);stroke-width:2.2}
+					.t{font: 14px system-ui; fill: hsl(150,25%,92%)}
+					.cap{font: 12px system-ui; fill: hsl(160,10%,65%)}
+					.node{fill: color-mix(in oklab, hsl(165,18%,9%), white 3%); stroke: color-mix(in oklab, white, transparent 90%); stroke-width:1.2}
+					.img{fill: color-mix(in oklab, hsl(30,85%,55%), black 30%)}
+					.attr{fill: color-mix(in oklab, hsl(160,70%,45%), black 40%)}
+					.rel{fill: none; stroke: color-mix(in oklab, white, transparent 75%); stroke-dasharray:4 6}
+		        </style>
+			</defs>
+			<text x="40" y="28" class="t" style="font-weight:700">A-MMKG: images as attribute values</text>
+			<rect x="20" y="40" width="500" height="300" rx="14" class="node"/>
+			<circle cx="110" cy="130" r="26" class="node"/><text x="90" y="135" class="t">Paris</text>
+			<circle cx="260" cy="130" r="26" class="node"/><text x="242" y="135" class="t">Eiffel</text>
+			<circle cx="410" cy="130" r="26" class="node"/><text x="396" y="135" class="t">Tower</text>
+			<line x1="136" y1="130" x2="234" y2="130" class="rel"/><text x="166" y="120" class="cap">capitalOf</text>
+			<line x1="286" y1="130" x2="384" y2="130" class="rel"/><text x="304" y="120" class="cap">locatedIn</text>
+			<!-- image attributes -->
+			<rect x="70" y="210" width="90" height="60" rx="6" class="img"/><text x="76" y="282" class="cap">hasImage</text>
+			<rect x="220" y="210" width="90" height="60" rx="6" class="img"/><text x="226" y="282" class="cap">hasImage</text>
+			<rect x="370" y="210" width="90" height="60" rx="6" class="img"/><text x="376" y="282" class="cap">hasImage</text>
+			<line x1="110" y1="156" x2="115" y2="210" class="b"/>
+			<line x1="260" y1="156" x2="265" y2="210" class="b"/>
+			<line x1="410" y1="156" x2="415" y2="210" class="b"/>
+			<text x="600" y="28" class="t" style="font-weight:700">N-MMKG: images as first-class nodes</text>
+			<rect x="580" y="40" width="500" height="300" rx="14" class="node"/>
+			<circle cx="660" cy="120" r="26" class="node"/><text x="642" y="125" class="t">Eiffel</text>
+			<circle cx="810" cy="120" r="26" class="node"/><text x="792" y="125" class="t">Tower</text>
+			<rect x="950" y="90" width="100" height="70" rx="6" class="img"/><text x="966" y="170" class="cap">imageOf</text>
+			<line x1="686" y1="120" x2="784" y2="120" class="rel"/><text x="710" y="110" class="cap">locatedIn</text>
+			<line x1="836" y1="120" x2="950" y2="125" class="b"/>
+			<!-- inter-image relations -->
+			<rect x="900" y="230" width="100" height="60" rx="6" class="img"/><text x="914" y="305" class="cap">similar</text>
+			<line x1="1000" y1="160" x2="950" y2="230" class="b"/>
+		</svg>
+		<figcaption>Two mainstream representations: A-MMKG (images as attribute values) and N-MMKG (images as nodes with their own relations).</figcaption>
+	</figure>
+
+	<section>
+		<h2>What is a Multi-Modal Knowledge Graph?</h2>
+		<p>A classic KG holds <em>symbols</em>—entities, relations, and attributes—expressed in text. An MMKG augments some of those symbols with <em>grounded</em> sensory evidence (e.g., images). This yields richer context, disambiguation power (“Rocky” the dog vs “Rocky” the boxer), and better transfer to tasks like visual QA and captioning.</p>
+		<div class="callout">
+		  	<strong>Key benefit:</strong> MMKGs bridge statistical vision models and symbolic reasoning, improving coverage of long-tail entities and enabling interpretable, cross-modal answers.
+		</div>
+	</section>
+
+	<section>
+		<h2>Two Construction Pipelines</h2>
+		<h3>1) Images → Symbols (label visual data with KG terms)</h3>
+		<p>Start from images (news, web, domain corpora). Detect and name <em>entities</em>, <em>relations</em>, and <em>events</em>; then insert them into the graph.</p>
+		<div class="grid">
+		  <div class="card">
+		    <h4 style="margin:.2rem 0">Entities & Concepts</h4>
+		    <ul>
+				<li><strong>Object recognition</strong> (detectors + classifiers) for named things; cluster variants across views.</li>
+				<li><strong>Visual grounding</strong> (align caption phrases to regions) for open-world extraction; threshold heatmaps to get boxes.</li>
+				<li><strong>VL pretraining boost</strong>: models like CLIP/VL-Transformers help detect popular people/landmarks in the wild.</li>
+		    </ul>
+		</div>
+		<div class="card">
+		<h4 style="margin:.2rem 0">Relations</h4>
+		<ul>
+			<li><strong>Rule patterns</strong> (e.g., containment → <em>partOf</em>) are precise but labor-intensive.</li>
+			<li><strong>Statistical models</strong> classify predicates from appearance + layout + language priors; graph-based message passing helps.</li>
+			<li><strong>Long-tail predicates</strong> need re-balancing (metric/contrastive/few-shot) and causal debiasing.</li>
+		</ul>
+		</div>
+		<div class="card">
+		<h4 style="margin:.2rem 0">Events</h4>
+		<ul>
+			<li><strong>Schema mining</strong> from frequent visual patterns tied to event triggers in text.</li>
+			<li><strong>Argument extraction</strong> by aligning situation graphs (image) with AMR (caption) and enforcing cross-modal consistency.</li>
+			<li><strong>Video</strong> adds temporal scope and sub-events; keyframe sampling is a practical start.</li>
+		</ul>
+		</div>
+		</div>
+
+		<!-- Figure 2: Pipeline -->
+		<figure>
+		  	<svg viewBox="0 0 1100 200" width="100%" height="auto" role="img" aria-label="Image to Symbols pipeline">
+			    <defs>
+					<style>
+					.box{fill:color-mix(in oklab, hsl(165,18%,12%), white 3%);stroke:color-mix(in oklab, white, transparent 90%);stroke-width:1.2;rx:12}
+					.arrow{fill:none;stroke:hsl(160,70%,45%);stroke-width:2.2;marker-end:url(#m)}
+					.txt{font:14px system-ui;fill:hsl(150,25%,92%)}
+					</style>
+			      	<marker id="m" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+			        	<polygon points="0 0, 6 3, 0 6" fill="hsl(160,70%,45%)"/>
+			      	</marker>
+			    </defs>
+			    <rect x="20" y="40" width="220" height="120" class="box"/><text x="40" y="100" class="txt">Images + Captions</text>
+			    <rect x="280" y="40" width="260" height="120" class="box"/><text x="300" y="92" class="txt">Detectors &amp; Grounding</text><text x="300" y="118" class="txt">Entities • Relations • Events</text>
+			    <rect x="580" y="40" width="220" height="120" class="box"/><text x="600" y="100" class="txt">Schema &amp; Consistency</text>
+			    <rect x="840" y="40" width="240" height="120" class="box"/><text x="860" y="92" class="txt">Insert to KG</text><text x="860" y="118" class="txt">A-MMKG / N-MMKG</text>
+			    <path d="M240 100 L280 100" class="arrow"/>
+			    <path d="M540 100 L580 100" class="arrow"/>
+			    <path d="M800 100 L840 100" class="arrow"/>
+		  	</svg>
+		  	<figcaption>Pipeline A: label images, align with text, enforce constraints, then write to the graph.</figcaption>
+		</figure>
+
+		<h3>2) Symbols → Images (ground KG symbols to visual evidence)</h3>
+		<p>Start from an existing KG (DBpedia/Wikidata/domain KGs) and attach visual evidence by querying encyclopedias and search engines, then filter for relevance and diversity.</p>
+		<ul class="card">
+			<li><strong>Entity grounding:</strong> build robust queries (name + type disambiguation), harvest images, re-rank, and dedupe.</li>
+			<li><strong>Concept grounding:</strong> first decide if a concept is <em>visualizable</em>; then pick representative and diverse images across sub-topics.</li>
+			<li><strong>Relation grounding:</strong> treat triples as fine-grained queries; prefer images that <em>express the predicate</em>, not just co-presence.</li>
+			<li><strong>Diversity & bias:</strong> enforce topical spread (e.g., Max-Min or graph-walk re-ranking) and audit demographic/cultural skews.</li>
+		</ul>
+
+		<!-- Figure 3: Symbols to Images -->
+		<figure>
+		  	<svg viewBox="0 0 1100 220" width="100%" height="auto" role="img" aria-label="Symbols to Images pipeline">
+		    	<defs>
+			      	<style>
+			        	.box2{fill:color-mix(in oklab, hsl(165,18%,9%), white 2%);stroke:color-mix(in oklab, white, transparent 90%);stroke-width:1.2;rx:12}
+			        	.img{fill: color-mix(in oklab, hsl(30,85%,55%), black 30%)}
+			        	.arrow{fill:none;stroke:hsl(160,70%,45%);stroke-width:2.2;marker-end:url(#m2)}
+			        	.txt{font:14px system-ui;fill:hsl(150,25%,92%)}
+			      	</style>
+		      		<marker id="m2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+		        		<polygon points="0 0, 6 3, 0 6" fill="hsl(160,70%,45%)"/>
+		      		</marker>
+		    	</defs>
+			    <rect x="20" y="40" width="220" height="120" class="box2"/><text x="40" y="100" class="txt">KG Symbols</text>
+			    <rect x="280" y="40" width="220" height="120" class="box2"/><text x="300" y="92" class="txt">Query Builder</text><text x="300" y="118" class="txt">Name + Type</text>
+			    <rect x="540" y="40" width="220" height="120" class="box2"/><text x="560" y="92" class="txt">Harvest</text><text x="560" y="118" class="txt">Encyclopedia + Web</text>
+			    <rect x="800" y="40" width="280" height="120" class="box2"/><text x="820" y="86" class="txt">Filter</text><text x="820" y="112" class="txt">Relevance • Quality • Diversity</text>
+			    <path d="M240 100 L280 100" class="arrow"/>
+			    <path d="M500 100 L540 100" class="arrow"/>
+			    <path d="M760 100 L800 100" class="arrow"/>
+			    <rect x="900" y="180" width="100" height="24" rx="6" class="img"/><text x="910" y="198" class="txt">Images</text>
+		  	</svg>
+		  	<figcaption>Pipeline B: start from symbols, then find, rank, and attach visual evidence.</figcaption>
+		</figure>
+	</section>
+	<section>
+		<h2>Choosing A-MMKG vs N-MMKG</h2>
+		<div class="grid">
+		  	<div class="card">
+		    	<h4 style="margin:.2rem 0">A-MMKG</h4>
+		    	<ul>
+			      	<li>Images as attribute values (e.g., <em>hasImage</em>).</li>
+			      	<li>Simple to build, compact storage, great for enrichment.</li>
+			      	<li>Best when images are supportive, not central.</li>
+		    	</ul>
+		  	</div>
+		  	<div class="card">
+		    	<h4 style="margin:.2rem 0">N-MMKG</h4>
+		    	<ul>
+			      	<li>Images as first-class nodes with inter-image edges (similar, nearBy, contain).</li>
+			      	<li>Richer cross-modal reasoning; higher cost & design complexity.</li>
+			      	<li>Best when visual structure is a core asset (news, map, product, movie graphs).</li>
+		    	</ul>
+		  	</div>
+		</div>
+	</section>
+	<section>
+		<h2>What MMKGs Enable</h2>
+		<div class="grid">
+		  	<div class="card">
+		    	<h4 style="margin:.2rem 0">In-Graph</h4>
+		    	<ul>
+			      	<li><strong>Link prediction</strong> with visual features improves long-tail completion.</li>
+			      	<li><strong>Triple classification</strong> by scoring multi-modal embeddings.</li>
+			      	<li><strong>Entity alignment</strong> across KGs via text+vision similarity.</li>
+			      	<li><strong>Entity typing</strong> (IsA) using images + neighborhood.</li>
+		    	</ul>
+		  	</div>
+		  	<div class="card">
+		    	<h4 style="margin:.2rem 0">Out-of-Graph</h4>
+		    	<ul>
+			      	<li><strong>VQA & captioning</strong> with background knowledge (unseen or rare objects).</li>
+			      	<li><strong>Cross-modal retrieval</strong> (triples → images; images → facts).</li>
+			      	<li><strong>NLP gaps</strong> (NER/coref) resolved with visual cues (“Rocky” the pet vs person).</li>
+			      	<li><strong>Explainability</strong> via explicit visual evidence trails.</li>
+		    	</ul>
+		  	</div>
+		</div>
+	</section>
+	<section>
+		<h2>A Practical Build Checklist</h2>
+		<ol class="card">
+		  	<li><strong>Scope & representation:</strong> Will images be attributes (A-MMKG) or nodes (N-MMKG)? Decide up-front.</li>
+		  	<li><strong>Seed sources:</strong> Image+caption corpora, encyclopedias, domain archives, web search APIs with rate/bias constraints.</li>
+		  	<li><strong>Extraction:</strong> Run detection + grounding; log confidence, region boxes, and text spans for auditability.</li>
+		  	<li><strong>Schema & alignment:</strong> Normalize to KG vocab; align situation graphs ↔ AMR for events.</li>
+		  	<li><strong>Filtering:</strong> Quality, dedupe, and diversity re-ranking (e.g., Max-Min or graph-walk).</li>
+		  	<li><strong>Bias audits:</strong> Track demographic, geographic, and topical skews; add mitigations.</li>
+		  	<li><strong>Embedding & ops:</strong> Train multi-modal embeddings; index image features; version everything.</li>
+		  	<li><strong>Evaluation:</strong> Build <em>visual</em> test sets for link prediction and retrieval; measure long-tail lift, not just head entities.</li>
+		</ol>
+	</section>
+	<section>
+		<h2>Open Problems Worth Your Time</h2>
+		<ul>
+		  	<li><strong>Deep semantic relation grounding:</strong> Images that truly <em>express</em> predicates like <em>spouseOf</em>, not mere co-occurrence.</li>
+		  	<li><strong>Abstract concept grounding:</strong> Visual proxies for affective/abstract nouns without drifting into stereotypes.</li>
+		  	<li><strong>Video event composition:</strong> Sub-events, ordering, causal links, and temporal grounding at scale.</li>
+		  	<li><strong>Multi-context entity grounding:</strong> Context-conditioned image selection (e.g., “scientist” vs “politician” facets).</li>
+		  	<li><strong>Causal debiasing:</strong> Move beyond likelihood toward counterfactual evidence for long-tail relations.</li>
+		</ul>
+	</section>
+	<hr>
+	<!-- References only (no in-body cites per request) -->
+	<section>
+	<h2>References</h2>
+		<ol class="ref">
+		  	<li>
+		    	Zhu, X., Li, Z., Wang, X., Jiang, X., Sun, P., Wang, X., Xiao, Y., &amp; Yuan, N. J. (2024).
+		    	<em>Multi-Modal Knowledge Graph Construction and Application: A Survey</em>.
+		    	IEEE Transactions on Knowledge and Data Engineering, 36(2), 715–736.  [oai_citation:0‡Multi-Modal_Knowledge_Graph_Construction_and_Application_A_Survey.pdf](file-service://file-G5LWFh3WEba8PPsWPh4qYj)
+		  	</li>
+		</ol>
+	</section>
+	<script>
+	  	(function(){
+	    	const saved = localStorage.getItem('theme');
+	    	if(saved) document.documentElement.dataset.theme = saved;
+	  	})();
+	</script>
+</article>
+
+
+
+
+

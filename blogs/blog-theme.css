@@ -1,0 +1,144 @@
+/* === Eigenbytes Evergreen & Ember — Blog Theme === */
+/* Core tokens */
+:root{
+  /* Dark mode (default) */
+  --bg: hsl(165 20% 6%);          /* deep evergreen */
+  --panel: hsl(165 18% 9%);       /* base surface */
+  --panel-2: hsl(165 18% 12%);    /* raised surface */
+  --text: hsl(150 25% 92%);       /* near-white */
+  --muted: hsl(160 10% 65%);      /* subdued text */
+
+  --brand: hsl(160 70% 45%);      /* emerald */
+  --brand-2: hsl(30 85% 55%);     /* ember / amber */
+  --ring: color-mix(in oklab, var(--brand), white 28%);
+
+  --radius: 18px;
+  --shadow: 0 10px 30px hsl(165 50% 2% / .6);
+
+  /* ----- Compatibility layer for older blog HTML ----- */
+  --bg-soft: var(--panel);
+  --chip: color-mix(in oklab, var(--panel), white 4%);
+  --line: color-mix(in oklab, var(--text), transparent 90%);
+  --accent: var(--brand-2);
+  --code: #0b0f14; /* deep slate for code blocks */
+}
+
+/* Light mode */
+:root[data-theme="light"]{
+  --bg: hsl(160 25% 97%);
+  --panel: hsl(0 0% 100%);
+  --panel-2: hsl(160 25% 95%);
+  --text: hsl(165 25% 10%);
+  --muted: hsl(165 12% 35%);
+  --ring: color-mix(in oklab, var(--brand), black 25%);
+  --chip: color-mix(in oklab, var(--panel), black 1%);
+  --line: color-mix(in oklab, var(--text), transparent 88%);
+  --code: #0b0f14;
+}
+
+/* Respect user system preference if your page is standalone */
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg: hsl(160 25% 97%);
+    --panel: hsl(0 0% 100%);
+    --panel-2: hsl(160 25% 95%);
+    --text: hsl(165 25% 10%);
+    --muted: hsl(165 12% 35%);
+    --ring: color-mix(in oklab, var(--brand), black 25%);
+    --chip: color-mix(in oklab, var(--panel), black 1%);
+    --line: color-mix(in oklab, var(--text), transparent 88%);
+    --code: #0b0f14;
+  }
+}
+
+/* ===== Base blog page styling ===== */
+*{ box-sizing:border-box }
+html,body{ height:100% }
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--brand), transparent 85%), transparent),
+    radial-gradient(1000px 500px at -10% 20%, color-mix(in oklab, var(--brand-2), transparent 85%), transparent),
+    var(--bg);
+  color:var(--text);
+  font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+  accent-color: var(--brand);
+}
+
+main{ max-width:980px; margin:0 auto; padding:16px 20px 80px }
+header{ max-width:980px; margin:0 auto; padding:48px 20px 12px }
+header h1{ margin:0 0 10px; font-size:clamp(28px,3.6vw,44px); line-height:1.1; letter-spacing:.2px }
+header p{ margin:0; color:var(--muted) }
+
+h2{ margin-top:38px }
+h3{ margin-top:26px }
+a{ color:var(--brand); text-decoration:none }
+a:hover{ text-decoration:underline }
+
+/* Cards, panels, callouts */
+.card{
+  background: color-mix(in oklab, var(--panel), transparent 0%);
+  border:1px solid var(--line);
+  border-radius: var(--radius);
+  padding:16px;
+  box-shadow: var(--shadow);
+}
+.summary{
+  background:linear-gradient(180deg, color-mix(in oklab, var(--panel), black 2%), color-mix(in oklab, var(--panel-2), black 1%));
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px 16px;
+}
+.callout{
+  border-left:4px solid var(--brand);
+  background: color-mix(in oklab, var(--panel), white 2%);
+  border-radius:10px;
+  padding:12px;
+}
+
+/* Chips, grids, figure */
+.chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px }
+.chip{ background:var(--chip); color:var(--text); padding:6px 10px; border-radius:999px; font-size:12px; white-space:nowrap }
+.grid{ display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)) }
+
+figure{
+  margin:22px 0;
+  background: var(--panel);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:8px;
+}
+figcaption{ font-size:12px; color:var(--muted); padding:6px 8px 4px }
+
+/* TOC block */
+.toc{
+  background: var(--panel);
+  border:1px dashed var(--line);
+  border-radius:12px;
+  padding:14px 16px;
+}
+
+/* Code blocks */
+pre, code{ background: var(--code); color: var(--text) }
+pre{ padding:12px; border-radius:10px; overflow:auto }
+
+/* HR & small text */
+hr{ border:none; border-top:1px solid var(--line); margin:38px 0 }
+.ref, .legend, .meta{ color:var(--muted); font-size:13px }
+
+/* Buttons (for inline links like “Read”) */
+.btn{
+  display:inline-flex; gap:.6rem; align-items:center;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,
+    color-mix(in oklab, var(--panel), white 4%),
+    color-mix(in oklab, var(--panel-2), black 2%)
+  );
+  padding:.55rem .9rem; border-radius:12px; text-decoration:none; color:var(--text);
+  box-shadow: var(--shadow);
+}
+.btn:hover{ transform: translateY(-1px) }
+.btn:focus-visible{ outline:2px solid var(--ring); outline-offset:2px }
+
+/* Footer inside posts */
+footer{ max-width:980px; margin:0 auto; padding:40px 20px; color:var(--muted); border-top:1px solid var(--line) }
