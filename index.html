@@ -369,6 +369,136 @@
       body{ font-size:15px; }
       .card{ padding:16px; }
     }
+    /* iFrame */
+    .cognition-card {
+      padding: 0;
+      overflow: visible;
+    }
+
+    .responsive-iframe-wrap {
+      position: relative;
+      width: 100%;
+      min-height: 520px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: color-mix(in oklab, var(--panel, #020403), white 2%);
+      transition: height .25s ease, box-shadow .25s ease, border-radius .25s ease,
+                  transform .25s ease;
+    }
+
+    .responsive-iframe-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Floating instruction overlay */
+    .cognition-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        145deg,
+        color-mix(in oklab, var(--bg, #020403), transparent 5%),
+        color-mix(in oklab, var(--bg, #020403), transparent 35%)
+      );
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 16px;
+      pointer-events: auto;
+      z-index: 2;
+    }
+
+    .cognition-overlay-inner {
+      width: min(640px, 100%);
+      border-radius: 16px;
+      padding: 16px 18px;
+      border: 1px solid color-mix(in oklab, var(--text, #fff), transparent 80%);
+      background: color-mix(in oklab, var(--panel, #020403), transparent 10%);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-size: 0.95rem;
+    }
+
+    .cognition-overlay-inner p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .cognition-overlay-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-radius: 999px;
+      border: 1px solid color-mix(in oklab, var(--text, #fff), transparent 80%);
+      padding: 0.3rem 0.75rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .btn-ghost:hover {
+      background: color-mix(in oklab, var(--panel, #020403), white 4%);
+    }
+
+    /* Fullscreen toggle button */
+    .cognition-fullscreen-toggle {
+      position: absolute;
+      inset: 10px 12px auto auto;
+      z-index: 3;
+      border-radius: 999px;
+      border: 1px solid color-mix(in oklab, var(--text, #fff), transparent 80%);
+      background: color-mix(in oklab, var(--panel-2, #050809), white 8%);
+      color: var(--text, #fff);
+      padding: 4px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+    }
+
+    .cognition-fullscreen-toggle:hover {
+      background: color-mix(in oklab, var(--panel-2, #050809), white 14%);
+    }
+
+    /* Fullscreen state */
+    .responsive-iframe-wrap.is-fullscreen {
+      position: fixed;
+      inset: 8px;
+      width: calc(100vw - 16px);
+      height: calc(100vh - 16px);
+      max-width: none;
+      max-height: none;
+      margin: 0;
+      border-radius: 14px;
+      box-shadow: 0 18px 50px hsl(220 50% 2% / 0.75);
+      z-index: 9998;
+      transform: none;
+    }
+
+    body.cognition-no-scroll {
+      overflow: hidden;
+    }
+
+    .responsive-iframe-wrap.is-fullscreen .cognition-overlay-inner {
+      max-width: 720px;
+    }
+
+    @media (max-width: 700px) {
+      .cognition-overlay-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
   </style>
 </head>
 <body>
@@ -440,6 +570,60 @@
             <li>🛠️ <strong>Code & tools</strong>: notebooks, pipelines, TikZ diagrams, and Overleaf-ready templates.</li>
             <li>🛡️ <strong>AI security</strong>: policy-violation detection, adversarial skills, and abuse in the wild.</li>
           </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Insert Cognition Curator App -->
+    <section id="cognition-curator" class="reveal">
+      <div class="container">
+        <h2>Cognition Curator — Agentic Blog Post Generator</h2>
+        <p class="lead">
+          This app uses an autonomous AI agent to generate blog posts from
+          multiple top-tier academic sources based on your input. You can create
+          your own blog posts or read the tailored examples down below.
+        </p>
+
+        <div class="card cognition-card">
+          <div class="responsive-iframe-wrap" id="cognition-frame-wrap">
+            <!-- Floating header overlay -->
+            <div class="cognition-overlay" id="cognition-overlay">
+              <div class="cognition-overlay-inner">
+                <div>
+                  <strong>How to use Cognition Curator</strong>
+                  <p>
+                    1) Enter your topic and constraints.<br>
+                    2) The agent pulls from top-tier academic sources.<br>
+                    3) Refine, export, or compare with the examples below.
+                  </p>
+                </div>
+                <div class="cognition-overlay-actions">
+                  <button type="button"
+                          class="btn btn-ghost"
+                          id="cognition-dismiss-overlay">
+                    Got it
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fullscreen toggle button -->
+            <button type="button"
+                    class="cognition-fullscreen-toggle"
+                    id="cognition-fullscreen-toggle"
+                    aria-pressed="false"
+                    aria-label="Toggle fullscreen for Cognition Curator">
+              ⤢
+            </button>
+
+            <!-- The iframe -->
+            <iframe
+              id="cognition-frame"
+              src="https://cognition-curator--jaydataiot.replit.app"
+              loading="lazy"
+              allow="fullscreen"
+            ></iframe>
+          </div>
         </div>
       </div>
     </section>
@@ -818,6 +1002,73 @@
 
     // Initial render with all content
     applyFiltersAndRender();
+  </script>
+
+  <script>
+    (function() {
+      const wrap = document.getElementById('cognition-frame-wrap');
+      const iframe = document.getElementById('cognition-frame');
+      const fsBtn = document.getElementById('cognition-fullscreen-toggle');
+      const overlay = document.getElementById('cognition-overlay');
+      const dismissOverlayBtn = document.getElementById('cognition-dismiss-overlay');
+
+      if (!wrap || !iframe) return;
+
+      // --- Fullscreen toggle ---
+      function toggleFullscreen() {
+        const isNowFullscreen = !wrap.classList.contains('is-fullscreen');
+        wrap.classList.toggle('is-fullscreen', isNowFullscreen);
+        document.body.classList.toggle('cognition-no-scroll', isNowFullscreen);
+        fsBtn.setAttribute('aria-pressed', String(isNowFullscreen));
+        fsBtn.textContent = isNowFullscreen ? '⤡' : '⤢'; // icon invert
+      }
+
+      fsBtn?.addEventListener('click', toggleFullscreen);
+
+      // --- Overlay behavior ---
+      function hideOverlay() {
+        if (!overlay) return;
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+        setTimeout(() => overlay.remove(), 260);
+      }
+
+      dismissOverlayBtn?.addEventListener('click', hideOverlay);
+
+      // Auto-hide overlay after some time as a fallback
+      setTimeout(hideOverlay, 12000);
+
+      // --- Auto-height via postMessage ---
+      const TRUSTED_ORIGIN = 'https://cognition-curator--jaydataiot.replit.app';
+
+      function handleHeightMessage(event) {
+        // If you want to lock this down, uncomment the origin check:
+        if (event.origin !== TRUSTED_ORIGIN) return;
+
+        const data = event.data || {};
+        if (data.type !== 'cognition-curator-height') return;
+
+        const h = Number(data.height);
+        if (!Number.isFinite(h)) return;
+
+        // Clamp height to a reasonable range
+        const clamped = Math.max(520, Math.min(h, 2400));
+        wrap.style.height = clamped + 'px';
+      }
+
+      window.addEventListener('message', handleHeightMessage, false);
+
+      // Fallback: set initial height relative to viewport if no messages arrive
+      function setInitialHeight() {
+        if (wrap.style.height) return; // already set by postMessage
+        const vh = window.innerHeight || 800;
+        wrap.style.height = Math.max(520, Math.round(vh * 0.75)) + 'px';
+      }
+
+      window.addEventListener('resize', setInitialHeight);
+      window.addEventListener('orientationchange', setInitialHeight);
+      setInitialHeight();
+    })();
   </script>
 
   <!-- Tiny toast style for future use -->
