@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>More Tutorials — Eigenbytes</title>
-  <meta name="description" content="Hands-on tutorials for AI, Data Science, ML, and AI Security — with code, datasets, and walkthroughs." />
+  <meta name="description" content="Deep-dive tutorials for AI, Data Science, ML, and AI Security — with code, datasets, and walkthroughs." />
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#0e1015" />
   <link rel="icon" href="/favicon.ico" sizes="any">
@@ -12,7 +12,7 @@
   <link rel="manifest" href="/manifest.webmanifest">
 
   <style>
-    /* ===== Evergreen & Ember palette (attribute-based theming) ===== */
+    /* ===== Evergreen & Ember palette (attribute-based theming, same as Previous Blogs) ===== */
     :root {
       /* defaults (used if no data-theme set) */
       --bg: hsl(165 20% 6%);
@@ -25,6 +25,7 @@
       --ring: color-mix(in oklab, var(--brand), white 28%);
       --radius: 18px;
       --shadow: 0 10px 30px hsl(165 50% 2% / .6);
+      --card-w: clamp(260px, 38vw, 360px);
     }
 
     /* Explicit dark mode */
@@ -49,6 +50,7 @@
 
     *{ box-sizing:border-box }
     html,body{ height:100% }
+
     body{
       margin:0;
       font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
@@ -56,9 +58,14 @@
         radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--brand), transparent 85%), transparent) no-repeat,
         radial-gradient(1000px 500px at -10% 20%, color-mix(in oklab, var(--brand-2), transparent 85%), transparent) no-repeat,
         var(--bg);
-      background-repeat:no-repeat; background-size:cover; background-position:center top;
-      color:var(--text); accent-color:var(--brand); scroll-behavior:smooth;
+      background-repeat:no-repeat;
+      background-size:cover;
+      background-position:center top;
+      color:var(--text);
+      accent-color:var(--brand);
+      scroll-behavior:smooth;
     }
+
     .container{ width:min(1200px,92%); margin-inline:auto }
 
     header.site{
@@ -67,15 +74,49 @@
       background: color-mix(in oklab, var(--bg), transparent 40%);
       border-bottom:1px solid color-mix(in oklab, var(--text), transparent 90%);
     }
-    nav{ display:flex; align-items:center; gap:12px; padding:10px 0 }
-    .brand{ display:flex; align-items:center; gap:10px; font-weight:800 }
+
+    nav{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px 0;
+      flex-wrap:nowrap;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:800
+    }
     .brand .logo{
       inline-size:36px; block-size:36px; display:grid; place-items:center; border-radius:12px;
       background:linear-gradient(135deg,var(--brand),var(--brand-2)); color:white; box-shadow:var(--shadow); font-weight:900
     }
-    .navlinks{ margin-left:auto; display:flex; flex-wrap:wrap; gap:8px }
-    .navlinks a{ padding:8px 12px; border-radius:999px; text-decoration:none; color:var(--text); opacity:.9 }
-    .navlinks a:is(:hover,:focus){ background:color-mix(in oklab, var(--panel), white 3%); outline:none }
+
+    .navlinks{
+      margin-left:auto;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .navlinks a{
+      padding:8px 12px;
+      border-radius:999px;
+      text-decoration:none;
+      color:var(--text);
+      opacity:.9;
+      white-space:nowrap;
+    }
+    .navlinks a:is(:hover,:focus){
+      background:color-mix(in oklab, var(--panel), white 3%);
+      outline:none;
+    }
+
+    .header-controls{
+      margin-left:auto;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:nowrap;
+    }
 
     .btn{
       display:inline-flex; gap:.6rem; align-items:center;
@@ -85,13 +126,39 @@
         color-mix(in oklab, var(--panel-2), black 2%)
       );
       padding:.6rem .95rem; border-radius:12px; text-decoration:none; color:var(--text); box-shadow:var(--shadow);
+      white-space:nowrap;
       cursor:pointer;
     }
     .btn:hover{ transform:translateY(-1px) }
     .btn:is(:focus-visible){ outline:2px solid var(--ring); outline-offset:2px }
 
-    .hero{ padding: clamp(36px, 6vw, 72px) 0 }
-    .hero h1{ margin:0 0 6px; font-size:clamp(28px,5vw,48px); line-height:1.05; letter-spacing:-.02em }
+    /* Header search + sort */
+    #site-search{
+      padding:.55rem .8rem;
+      border-radius:10px;
+      border:1px solid color-mix(in oklab, var(--text), transparent 88%);
+      background:var(--panel);
+      color:var(--text);
+      min-width:0;
+      max-width:220px;
+    }
+    select.sort {
+      border:1px solid color-mix(in oklab, var(--text), transparent 85%);
+      background:var(--panel);
+      color:var(--text);
+      border-radius:10px;
+      padding:.45rem .6rem;
+    }
+
+    .hero{
+      padding: clamp(36px, 6vw, 72px) 0;
+    }
+    .hero h1{
+      margin:0 0 6px;
+      font-size:clamp(28px,5vw,48px);
+      line-height:1.05;
+      letter-spacing:-.02em;
+    }
     .lead{ color:var(--muted) }
 
     .card{
@@ -99,53 +166,145 @@
       border:1px solid color-mix(in oklab, var(--text), transparent 90%);
       border-radius: var(--radius); padding:20px; box-shadow: var(--shadow)
     }
+
     .pill{
       font-size:12px; padding:.25rem .55rem; border-radius:999px;
       background: color-mix(in oklab, var(--brand), white 78%);
       color: color-mix(in oklab, var(--brand), black 20%); font-weight:700
     }
 
-    section{ padding: clamp(28px, 5vw, 56px) 0 }
-    .filters{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:12px 0 }
-    .filters input[type="search"]{
-      padding:.55rem .8rem; border-radius:10px;
-      border:1px solid color-mix(in oklab, var(--text), transparent 88%);
-      background:var(--panel); color:var(--text)
+    section{
+      padding: clamp(28px, 5vw, 56px) 0;
     }
-    .tabs{ display:flex; gap:8px; flex-wrap:wrap }
+
+    .filters{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin:12px 0;
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
     .tabs button{
       border:1px solid color-mix(in oklab, var(--text), transparent 85%);
-      background:var(--panel); padding:.45rem .8rem; border-radius:10px; color:var(--text); cursor:pointer
+      background:var(--panel);
+      padding:.45rem .8rem;
+      border-radius:10px;
+      color:var(--text);
+      cursor:pointer;
+      white-space:nowrap;
     }
     .tabs button[aria-selected="true"]{
       outline:2px solid var(--ring);
-      background: color-mix(in oklab, var(--panel), white 3%)
-    }
-    select.sort {
-      border:1px solid color-mix(in oklab, var(--text), transparent 85%);
-      background:var(--panel); color:var(--text); border-radius:10px; padding:.45rem .6rem;
+      background: color-mix(in oklab, var(--panel), white 3%);
     }
 
+    /* Tutorials grid + cards */
     .grid{
-      display:grid; gap:16px;
+      display:grid;
+      gap:16px;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     }
-    .tutorial{ display:flex; flex-direction:column; gap:10px }
+
+    .tutorial{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
     .tutorial img{
-      width:100%; height:160px; object-fit:cover; border-radius:12px;
+      width:100%;
+      height:160px;
+      object-fit:cover;
+      border-radius:12px;
       border:1px solid color-mix(in oklab, var(--text), transparent 90%);
     }
-    .tutorial .meta{ color:var(--muted); font-size:.9rem; display:flex; gap:8px; flex-wrap:wrap }
+
+    .tutorial .meta{
+      color:var(--muted);
+      font-size:.9rem;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
     .chip{
-      font-size:12px; padding:.2rem .5rem; border-radius:999px; border:1px solid color-mix(in oklab, var(--text), transparent 85%);
-      color:var(--muted)
+      font-size:12px;
+      padding:.2rem .5rem;
+      border-radius:999px;
+      border:1px solid color-mix(in oklab, var(--text), transparent 85%);
+      color:var(--muted);
     }
 
     footer{
       border-top:1px solid color-mix(in oklab, var(--text), transparent 90%);
-      padding:20px 0 60px; color:var(--muted)
+      padding:20px 0 60px;
+      color:var(--muted);
     }
-    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0 }
+
+    .sr-only{
+      position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+      overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+    }
+
+    /* ========= Responsive tweaks (matching Previous Blogs behavior) ========= */
+
+    @media (max-width: 900px){
+      nav{
+        flex-wrap:wrap;
+      }
+
+      .navlinks{
+        order:3;
+        width:100%;
+        justify-content:flex-start;
+        overflow-x:auto;
+        padding-top:6px;
+      }
+
+      .header-controls{
+        order:2;
+        margin-left:0;
+        width:100%;
+        justify-content:flex-start;
+        flex-wrap:wrap;
+      }
+
+      #site-search{
+        flex:1 1 140px;
+        max-width:none;
+      }
+
+      .hero{
+        padding-top:32px;
+      }
+    }
+
+    @media (max-width: 600px){
+      .grid{
+        grid-template-columns: 1fr;
+      }
+
+      .card{
+        padding:16px;
+      }
+
+      .filters{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      footer .container{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:6px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -158,6 +317,7 @@
           <a class="logo" href="/" aria-label="Eigenbytes Home">EB</a>
           <span>Eigenbytes</span>
         </div>
+
         <div class="navlinks" role="menubar">
           <a role="menuitem" href="/">Home</a>
           <a role="menuitem" href="/#blog">Blog</a>
@@ -165,7 +325,8 @@
           <a role="menuitem" href="/#videos">Videos</a>
           <a role="menuitem" href="/more.html">About</a>
         </div>
-        <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
+
+        <div class="header-controls">
           <input id="site-search" placeholder="Search tutorials…" aria-label="Search tutorials" />
           <select id="sort" class="sort" aria-label="Sort tutorials">
             <option value="date_desc">Newest</option>
@@ -237,7 +398,7 @@
   </template>
 
   <script type="module">
-    // --- Theme toggle (improved, matches other page) ---
+    // --- Theme toggle (upgraded but compatible with Previous Blogs palette) ---
     const themeBtn = document.getElementById('theme-toggle');
     const root = document.documentElement;
 
@@ -259,28 +420,7 @@
 
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // --- Data load (expects data/tutorials.json) ---
-    /**
-     * Expected JSON shape:
-     * {
-     *   "tutorials":[
-     *     {
-     *       "title":"Build an RNN for Financial Time Series",
-     *       "excerpt":"Train, evaluate, and interpret an RNN on market data.",
-     *       "url":"/tutorials/rnn-finance.html",
-     *       "img":"/images/tutorials/rnn.jpg",
-     *       "date":"2025-10-21",
-     *       "updated":"2025-11-01",
-     *       "tags":["AI","RNN","Finance"],
-     *       "level":"Intermediate",         // Beginner | Intermediate | Advanced
-     *       "duration":"45 min",            // free text (e.g., "2 hrs", "45 min")
-     *       "format":"Article",             // Article | Notebook | Video | Mixed
-     *       "codeUrl":"https://github.com/…", // optional
-     *       "videoUrl":"https://youtu.be/…"    // optional
-     *     }
-     *   ]
-     * }
-     */
+    // --- Data load (reuses data/posts.json like the index/archive pages) ---
     let tutorials = [];
     try{
       const res = await fetch('data/posts.json', { cache:'no-store' });
@@ -288,14 +428,21 @@
       const all = await res.json();
       tutorials = (all.tutorials || []).slice();
     }catch(e){
-      console.error('Failed to load tutorials.json', e);
+      console.error('Failed to load tutorials from posts.json', e);
       tutorials = [];
     }
 
     // --- State ---
-    const state = { tag:'All', level:'All', q:'', page:1, pageSize:24, sort:'date_desc' };
+    const state = {
+      tag:'All',
+      level:'All',
+      q:'',
+      page:1,
+      pageSize:24,
+      sort:'date_desc'
+    };
 
-    // --- Build tag & level bars ---
+    // --- Build tag & level bars (similar to archive's tag bar) ---
     const tagBar = document.getElementById('tag-bar');
     const levelBar = document.getElementById('level-bar');
     const levels = ['All','Beginner','Intermediate','Advanced'];
@@ -304,28 +451,41 @@
       host.innerHTML = '';
       for(const it of items){
         const b = document.createElement('button');
-        b.textContent = it; b.setAttribute('role','tab');
+        b.textContent = it;
+        b.setAttribute('role','tab');
         b.setAttribute('aria-selected', String(it===selected));
         b.addEventListener('click',()=>{
           host.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected','false'));
-          b.setAttribute('aria-selected','true'); onClick(it);
+          b.setAttribute('aria-selected','true');
+          onClick(it);
         });
         host.appendChild(b);
       }
     }
 
     const tags = ['All', ...new Set(tutorials.flatMap(t => t.tags || []))].sort((a,b)=>{
-      if(a==='All') return -1; if(b==='All') return 1; return a.localeCompare(b);
+      if(a==='All') return -1;
+      if(b==='All') return 1;
+      return a.localeCompare(b);
     });
+
     buildTabs(tagBar, tags, state.tag, (t)=>{ state.tag=t; state.page=1; render(); });
     buildTabs(levelBar, levels, state.level, (l)=>{ state.level=l; state.page=1; render(); });
 
     document.getElementById('clear-filters').addEventListener('click', ()=>{
-      state.tag = 'All'; state.level='All'; state.q=''; state.page=1; state.sort='date_desc';
+      state.tag = 'All';
+      state.level='All';
+      state.q='';
+      state.page=1;
+      state.sort='date_desc';
+
       buildTabs(tagBar, tags, state.tag, (t)=>{ state.tag=t; state.page=1; render(); });
       buildTabs(levelBar, levels, state.level, (l)=>{ state.level=l; state.page=1; render(); });
-      const s = document.getElementById('site-search'); if(s) s.value='';
-      const sel = document.getElementById('sort'); if(sel) sel.value='date_desc';
+
+      const s = document.getElementById('site-search');
+      if(s) s.value='';
+      const sel = document.getElementById('sort');
+      if(sel) sel.value='date_desc';
       render();
     });
 
@@ -333,12 +493,15 @@
     const searchEl = document.getElementById('site-search');
     searchEl?.addEventListener('input', ()=>{
       state.q = searchEl.value.toLowerCase().trim();
-      state.page = 1; render();
+      state.page = 1;
+      render();
     });
 
     const sortEl = document.getElementById('sort');
     sortEl?.addEventListener('change', ()=>{
-      state.sort = sortEl.value; state.page=1; render();
+      state.sort = sortEl.value;
+      state.page = 1;
+      render();
     });
 
     // --- Helpers ---
@@ -356,9 +519,11 @@
     function sortItems(arr){
       const byDate = (a,b)=> new Date(b.date||b.updated||0) - new Date(a.date||a.updated||0);
       const byDateAsc = (a,b)=> -byDate(a,b);
+
       const levelRank = { 'Beginner':1, 'Intermediate':2, 'Advanced':3 };
       const byLevelAsc = (a,b)=> (levelRank[a.level]||9) - (levelRank[b.level]||9) || byDate(a,b);
       const byLevelDesc = (a,b)=> (levelRank[b.level]||-9) - (levelRank[a.level]||-9) || byDate(a,b);
+
       const durationToMin = v => {
         if(!v) return 99999;
         const m = v.toString().toLowerCase().match(/(\d+(?:\.\d+)?)\s*(h|hr|hrs|hour|hours|m|min|mins|minute|minutes)/);
@@ -399,10 +564,16 @@
       a.setAttribute('aria-label', `Start: ${t.title}`);
 
       const code = node.querySelector('[data-role="code"]');
-      if(t.codeUrl){ code.href = t.codeUrl; code.style.display = 'inline-flex'; }
+      if(t.codeUrl){
+        code.href = t.codeUrl;
+        code.style.display = 'inline-flex';
+      }
 
       const vid = node.querySelector('[data-role="video"]');
-      if(t.videoUrl){ vid.href = t.videoUrl; vid.style.display = 'inline-flex'; }
+      if(t.videoUrl){
+        vid.href = t.videoUrl;
+        vid.style.display = 'inline-flex';
+      }
 
       const art = node.querySelector('.tutorial');
       art.dataset.tags = (t.tags||[]).join(',');
@@ -429,13 +600,14 @@
     }
 
     loadMoreBtn.addEventListener('click', ()=>{
-      state.page += 1; render();
+      state.page += 1;
+      render();
       loadMoreBtn.scrollIntoView({ behavior:'smooth', block:'center' });
     });
 
     render();
 
-    // --- PWA optional ---
+    // --- PWA optional (same pattern as other pages) ---
     if('serviceWorker' in navigator){
       navigator.serviceWorker.register('/sw.js').catch(()=>{});
     }
