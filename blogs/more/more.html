@@ -12,8 +12,10 @@
   <link rel="manifest" href="/manifest.webmanifest">
 
   <style>
-    /* ===== Evergreen & Ember palette (same tokens) test ===== */
-    :root{
+    /* ===== Evergreen & Ember palette (same tokens)===== */
+    /* ===== Evergreen & Ember palette (attribute-based theming) ===== */
+    :root {
+      /* defaults (used if no data-theme set) */
       --bg: hsl(165 20% 6%);
       --panel: hsl(165 18% 9%);
       --panel-2: hsl(165 18% 12%);
@@ -26,23 +28,25 @@
       --shadow: 0 10px 30px hsl(165 50% 2% / .6);
       --card-w: clamp(260px, 38vw, 360px);
     }
-    :root[data-theme="light"]{
+
+    /* Explicit dark mode */
+    :root[data-theme="dark"] {
+      --bg: hsl(165 20% 6%);
+      --panel: hsl(165 18% 9%);
+      --panel-2: hsl(165 18% 12%);
+      --text: hsl(150 25% 92%);
+      --muted: hsl(160 10% 65%);
+      --ring: color-mix(in oklab, var(--brand), white 28%);
+    }
+
+    /* Explicit light mode */
+    :root[data-theme="light"] {
       --bg: hsl(160 25% 97%);
       --panel: hsl(0 0% 100%);
       --panel-2: hsl(160 25% 95%);
       --text: hsl(165 25% 10%);
       --muted: hsl(165 12% 35%);
       --ring: color-mix(in oklab, var(--brand), black 25%);
-    }
-    @media (prefers-color-scheme: light){
-      :root{
-        --bg: hsl(160 25% 97%);
-        --panel: hsl(0 0% 100%);
-        --panel-2: hsl(160 25% 95%);
-        --text: hsl(165 25% 10%);
-        --muted: hsl(165 12% 35%);
-        --ring: color-mix(in oklab, var(--brand), black 25%);
-      }
     }
 
     *{ box-sizing:border-box }
