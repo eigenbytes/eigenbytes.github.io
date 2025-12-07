@@ -12,8 +12,9 @@
   <link rel="manifest" href="/manifest.webmanifest">
 
   <style>
-    /* ===== Evergreen & Ember palette (same tokens) ===== */
-    :root{
+    /* ===== Evergreen & Ember palette (attribute-based theming) ===== */
+    :root {
+      /* defaults (used if no data-theme set) */
       --bg: hsl(165 20% 6%);
       --panel: hsl(165 18% 9%);
       --panel-2: hsl(165 18% 12%);
@@ -25,7 +26,19 @@
       --radius: 18px;
       --shadow: 0 10px 30px hsl(165 50% 2% / .6);
     }
-    :root[data-theme="light"]{
+
+    /* Explicit dark mode */
+    :root[data-theme="dark"] {
+      --bg: hsl(165 20% 6%);
+      --panel: hsl(165 18% 9%);
+      --panel-2: hsl(165 18% 12%);
+      --text: hsl(150 25% 92%);
+      --muted: hsl(160 10% 65%);
+      --ring: color-mix(in oklab, var(--brand), white 28%);
+    }
+
+    /* Explicit light mode */
+    :root[data-theme="light"] {
       --bg: hsl(160 25% 97%);
       --panel: hsl(0 0% 100%);
       --panel-2: hsl(160 25% 95%);
@@ -33,16 +46,7 @@
       --muted: hsl(165 12% 35%);
       --ring: color-mix(in oklab, var(--brand), black 25%);
     }
-    @media (prefers-color-scheme: light){
-      :root{
-        --bg: hsl(160 25% 97%);
-        --panel: hsl(0 0% 100%);
-        --panel-2: hsl(160 25% 95%);
-        --text: hsl(165 25% 10%);
-        --muted: hsl(165 12% 35%);
-        --ring: color-mix(in oklab, var(--brand), black 25%);
-      }
-    }
+
     *{ box-sizing:border-box }
     html,body{ height:100% }
     body{
@@ -233,16 +237,26 @@
   </template>
 
   <script type="module">
-    // --- Theme toggle (same behavior) ---
+    // --- Theme toggle (improved, matches other page) ---
     const themeBtn = document.getElementById('theme-toggle');
     const root = document.documentElement;
+
+    // Prefer saved theme; otherwise use system preference as a starting point
     const savedTheme = localStorage.getItem('theme');
-    if(savedTheme) root.dataset.theme = savedTheme;
-    themeBtn?.addEventListener('click', ()=>{
-      const t = root.dataset.theme === 'light' ? 'dark' : 'light';
-      root.dataset.theme = t; localStorage.setItem('theme', t);
-      themeBtn.setAttribute('aria-pressed', String(t==='dark'));
+    const prefersLight = window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: light)').matches;
+
+    const initialTheme = savedTheme || (prefersLight ? 'light' : 'dark');
+    root.dataset.theme = initialTheme;
+    themeBtn?.setAttribute('aria-pressed', String(initialTheme === 'dark'));
+
+    themeBtn?.addEventListener('click', () => {
+      const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+      root.dataset.theme = next;
+      localStorage.setItem('theme', next);
+      themeBtn.setAttribute('aria-pressed', String(next === 'dark'));
     });
+
     document.getElementById('year').textContent = new Date().getFullYear();
 
     // --- Data load (expects data/tutorials.json) ---
