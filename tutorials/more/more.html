@@ -398,16 +398,12 @@
   </template>
 
   <script type="module">
-    // --- Theme toggle (upgraded but compatible with Previous Blogs palette) ---
+    // --- Theme toggle: start in dark unless user previously chose something else ---
     const themeBtn = document.getElementById('theme-toggle');
     const root = document.documentElement;
 
-    // Prefer saved theme; otherwise use system preference as a starting point
     const savedTheme = localStorage.getItem('theme');
-    const prefersLight = window.matchMedia &&
-      window.matchMedia('(prefers-color-scheme: light)').matches;
-
-    const initialTheme = savedTheme || (prefersLight ? 'light' : 'dark');
+    const initialTheme = savedTheme || 'dark';   // <— always default to dark
     root.dataset.theme = initialTheme;
     themeBtn?.setAttribute('aria-pressed', String(initialTheme === 'dark'));
 
