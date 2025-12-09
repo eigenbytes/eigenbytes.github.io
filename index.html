@@ -369,7 +369,7 @@
       body{ font-size:15px; }
       .card{ padding:16px; }
     }
-    
+
     /* iFrame */
     .cognition-card {
       padding: 0;
@@ -436,6 +436,33 @@
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+
+    /* Password lock overlay */
+    .cognition-lock {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 4; /* above iframe + instruction overlay */
+      background: linear-gradient(
+        145deg,
+        color-mix(in oklab, var(--bg, #020403), transparent 5%),
+        color-mix(in oklab, var(--bg, #020403), transparent 35%)
+      );
+      backdrop-filter: blur(10px);
+    }
+
+    .cognition-lock-inner {
+      width: min(360px, 100%);
+      border-radius: 16px;
+      padding: 16px 18px;
+      border: 1px solid color-mix(in oklab, var(--text, #fff), transparent 80%);
+      background: color-mix(in oklab, var(--panel, #020403), white 4%);
+      box-shadow: 0 18px 40px hsl(220 50% 2% / 0.7);
+      font-size: 0.95rem;
     }
 
     .btn-ghost {
@@ -575,6 +602,7 @@
       </div>
     </section>
 
+    <!-- Insert Cognition Curator App (Password Protected / Upgraded) -->
     <!-- Insert Cognition Curator App -->
     <section id="cognition-curator" class="reveal">
       <div class="container">
@@ -587,7 +615,38 @@
 
         <div class="card cognition-card">
           <div class="responsive-iframe-wrap" id="cognition-frame-wrap">
-            <!-- Floating header overlay -->
+
+            <!-- 🔐 Password lock overlay (sits above everything) -->
+            <div class="cognition-lock" id="curator-lock">
+              <div class="cognition-lock-inner">
+                <h3 style="margin-top:0;">Protected tool</h3>
+                <p style="margin:0 0 8px;">
+                  Enter the access password to use Cognition Curator.
+                </p>
+
+                <form id="curator-lock-form" autocomplete="off" style="display:flex; flex-direction:column; gap:8px;">
+                  <input
+                    id="curator-lock-password"
+                    type="password"
+                    placeholder="Password…"
+                    aria-label="Password"
+                    style="padding:.6rem .8rem;
+                           border-radius:12px;
+                           border:1px solid color-mix(in oklab, var(--text, #fff), transparent 85%);
+                           background:var(--panel, #020403);
+                           color:var(--text, #fff);
+                           width:100%;">
+                  <button type="submit" class="btn">Unlock</button>
+                </form>
+
+                <p id="curator-lock-error"
+                   style="display:none; margin:4px 0 0; font-size:.85rem; color:#ff6b6b;">
+                  Incorrect password. Try again.
+                </p>
+              </div>
+            </div>
+
+            <!-- Floating header overlay (instructions) -->
             <div class="cognition-overlay" id="cognition-overlay">
               <div class="cognition-overlay-inner">
                 <div>
@@ -600,7 +659,7 @@
                 </div>
                 <div class="cognition-overlay-actions">
                   <button type="button"
-                          class="btn btn-ghost"
+                          class="btn-ghost"
                           id="cognition-dismiss-overlay">
                     Got it
                   </button>
@@ -617,7 +676,7 @@
               ⤢
             </button>
 
-            <!-- The iframe -->
+            <!-- The iframe (unchanged) -->
             <iframe
               id="cognition-frame"
               src="https://cognition-curator--jaydataiot.replit.app"
@@ -629,6 +688,142 @@
         </div>
       </div>
     </section>
+
+    <script>
+    /* ===========================================
+       Cognition Curator: Upgraded Password System
+       - Remembers unlock on this device (localStorage)
+       - Locks out for a period after repeated failures
+       =========================================== */
+    (function(){
+      const CONFIG = {
+        PASSWORD: "eigenbytes2025",              // ← change this to your desired password
+        STORAGE_KEY: "curator_access_v1",        // marks that this device is allowed
+        FAIL_KEY: "curator_fails_v1",
+        LOCK_KEY: "curator_lock_until_v1",
+        MAX_FAILS: 5,                            // number of tries before lockout
+        LOCK_MS: 15 * 60 * 1000                  // lockout duration (15 mins)
+      };
+
+      const gate   = document.getElementById("curator-password-gate");
+      const app    = document.getElementById("curator-app-container");
+      const submit = document.getElementById("curator-password-submit");
+      const input  = document.getElementById("curator-password-input");
+      const errEl  = document.getElementById("curator-password-error");
+      const lockEl = document.getElementById("curator-password-lock");
+      const iframe = document.getElementById("cognition-frame");
+
+      if (!gate || !app || !input || !submit || !iframe) return;
+
+      function now() { return Date.now(); }
+
+      function getLockUntil() {
+        const v = localStorage.getItem(CONFIG.LOCK_KEY);
+        return v ? parseInt(v, 10) || 0 : 0;
+      }
+
+      function getFails() {
+        const v = localStorage.getItem(CONFIG.FAIL_KEY);
+        return v ? parseInt(v, 10) || 0 : 0;
+      }
+
+      function setFails(n) {
+        localStorage.setItem(CONFIG.FAIL_KEY, String(n));
+      }
+
+      function setLockUntil(ts) {
+        localStorage.setItem(CONFIG.LOCK_KEY, String(ts));
+      }
+
+      function clearLockState() {
+        localStorage.removeItem(CONFIG.FAIL_KEY);
+        localStorage.removeItem(CONFIG.LOCK_KEY);
+      }
+
+      function markUnlocked() {
+        localStorage.setItem(CONFIG.STORAGE_KEY, "1");
+      }
+
+      function isUnlocked() {
+        return localStorage.getItem(CONFIG.STORAGE_KEY) === "1";
+      }
+
+      function showApp() {
+        gate.style.display = "none";
+        app.style.display = "block";
+
+        // Load iframe ONLY after access is granted
+        if (!iframe.src) {
+          const target = iframe.dataset.src || "https://cognition-curator--jaydataiot.replit.app";
+          iframe.src = target;
+        }
+      }
+
+      function updateLockUI() {
+        const lockUntil = getLockUntil();
+        const locked = lockUntil && now() < lockUntil;
+
+        if (locked) {
+          lockEl.style.display = "block";
+          errEl.style.display = "none";
+          input.disabled = true;
+          submit.disabled = true;
+        } else {
+          lockEl.style.display = "none";
+          input.disabled = false;
+          submit.disabled = false;
+        }
+      }
+
+      // If previously unlocked on this device, skip gate
+      if (isUnlocked()) {
+        showApp();
+        return;
+      }
+
+      // On load, reflect lockout state
+      updateLockUI();
+
+      function unlock() {
+        const lockUntil = getLockUntil();
+        if (lockUntil && now() < lockUntil) {
+          updateLockUI();
+          return;
+        }
+
+        const entered = input.value || "";
+        errEl.style.display = "none";
+        lockEl.style.display = "none";
+
+        if (entered === CONFIG.PASSWORD) {
+          clearLockState();
+          markUnlocked();
+          showApp();
+        } else {
+          let fails = getFails() + 1;
+          setFails(fails);
+
+          if (fails >= CONFIG.MAX_FAILS) {
+            const until = now() + CONFIG.LOCK_MS;
+            setLockUntil(until);
+            updateLockUI();
+          } else {
+            const remaining = CONFIG.MAX_FAILS - fails;
+            errEl.textContent =
+              remaining > 0
+                ? `Incorrect password. ${remaining} attempt${remaining === 1 ? "" : "s"} remaining before lockout.`
+                : "Incorrect password.";
+            errEl.style.display = "block";
+          }
+        }
+      }
+
+      submit.addEventListener("click", unlock);
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") unlock();
+      });
+    })();
+    </script>
 
     <section id="blog">
       <div class="container">
@@ -1027,7 +1222,7 @@
 
       fsBtn?.addEventListener('click', toggleFullscreen);
 
-      // --- Overlay behavior ---
+      // --- Instruction overlay behavior ---
       function hideOverlay() {
         if (!overlay) return;
         overlay.style.opacity = '0';
@@ -1036,33 +1231,27 @@
       }
 
       dismissOverlayBtn?.addEventListener('click', hideOverlay);
-
-      // Auto-hide overlay after some time as a fallback
       setTimeout(hideOverlay, 12000);
 
       // --- Auto-height via postMessage ---
       const TRUSTED_ORIGIN = 'https://cognition-curator--jaydataiot.replit.app';
 
       function handleHeightMessage(event) {
-        // If you want to lock this down, uncomment the origin check:
         if (event.origin !== TRUSTED_ORIGIN) return;
-
         const data = event.data || {};
         if (data.type !== 'cognition-curator-height') return;
 
         const h = Number(data.height);
         if (!Number.isFinite(h)) return;
 
-        // Clamp height to a reasonable range
         const clamped = Math.max(520, Math.min(h, 2400));
         wrap.style.height = clamped + 'px';
       }
 
       window.addEventListener('message', handleHeightMessage, false);
 
-      // Fallback: set initial height relative to viewport if no messages arrive
       function setInitialHeight() {
-        if (wrap.style.height) return; // already set by postMessage
+        if (wrap.style.height) return;
         const vh = window.innerHeight || 800;
         wrap.style.height = Math.max(520, Math.round(vh * 0.75)) + 'px';
       }
@@ -1070,6 +1259,62 @@
       window.addEventListener('resize', setInitialHeight);
       window.addEventListener('orientationchange', setInitialHeight);
       setInitialHeight();
+
+      // ==========================
+      // 🔐 Password lock behavior
+      // ==========================
+      const CURATOR_PASSWORD = 'eigenbytes2025'; // <- change this if you want
+      const STORAGE_KEY = 'curator_unlocked_v1';
+
+      const lockOverlay = document.getElementById('curator-lock');
+      const lockForm = document.getElementById('curator-lock-form');
+      const lockInput = document.getElementById('curator-lock-password');
+      const lockError = document.getElementById('curator-lock-error');
+
+      function hideLock() {
+        if (!lockOverlay) return;
+        lockOverlay.style.opacity = '0';
+        lockOverlay.style.pointerEvents = 'none';
+        setTimeout(() => lockOverlay.remove(), 260);
+      }
+
+      function isUnlocked() {
+        try {
+          return localStorage.getItem(STORAGE_KEY) === '1';
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function markUnlocked() {
+        try {
+          localStorage.setItem(STORAGE_KEY, '1');
+        } catch (e) {
+          // ignore storage errors
+        }
+      }
+
+      // If already unlocked on this device, hide the lock overlay immediately
+      if (lockOverlay && isUnlocked()) {
+        hideLock();
+      }
+
+      if (lockForm && lockInput) {
+        lockForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          if (!lockInput.value) return;
+
+          if (lockInput.value === CURATOR_PASSWORD) {
+            if (lockError) lockError.style.display = 'none';
+            markUnlocked();
+            hideLock();
+          } else {
+            if (lockError) {
+              lockError.style.display = 'block';
+            }
+          }
+        });
+      }
     })();
   </script>
 
