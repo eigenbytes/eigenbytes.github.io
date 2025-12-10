@@ -12,7 +12,6 @@
   <link rel="manifest" href="/manifest.webmanifest">
 
   <style>
-    /* ===== Evergreen & Ember palette (same tokens)===== */
     /* ===== Evergreen & Ember palette (attribute-based theming) ===== */
     :root {
       /* defaults (used if no data-theme set) */
@@ -81,7 +80,7 @@
       align-items:center;
       gap:12px;
       padding:10px 0;
-      flex-wrap:nowrap;
+      position:relative;
     }
 
     .brand{
@@ -92,31 +91,54 @@
       background:linear-gradient(135deg,var(--brand),var(--brand-2)); color:white; box-shadow:var(--shadow); font-weight:900
     }
 
+    /* Mobile nav toggle (same idea as index.html) */
+    .nav-toggle{
+      display:none;
+      margin-left:auto;
+      padding:.45rem .7rem;
+      border-radius:999px;
+      border:1px solid color-mix(in oklab, var(--text), transparent 85%);
+      background:var(--panel);
+      color:var(--text);
+      cursor:pointer;
+    }
+    .nav-toggle:focus-visible{
+      outline:2px solid var(--ring);
+      outline-offset:2px;
+    }
+
     .navlinks{
       margin-left:auto;
       display:flex;
       flex-wrap:wrap;
+      align-items:center;
+      gap:10px;
+    }
+    .nav-group{
+      display:flex;
+      align-items:center;
       gap:8px;
     }
-    .navlinks a{
+    .nav-group.nav-pages a{
       padding:8px 12px;
       border-radius:999px;
       text-decoration:none;
       color:var(--text);
       opacity:.9;
-      white-space:nowrap;
     }
-    .navlinks a:is(:hover,:focus){
+    .nav-group.nav-pages a:is(:hover,:focus){
       background:color-mix(in oklab, var(--panel), white 3%);
       outline:none;
     }
 
-    .header-controls{
-      margin-left:auto;
-      display:flex;
-      gap:8px;
-      align-items:center;
-      flex-wrap:nowrap;
+    /* Header search input (styled like index) */
+    .nav-search{
+      padding:.55rem .8rem;
+      border-radius:10px;
+      border:1px solid color-mix(in oklab, var(--text), transparent 88%);
+      background:var(--panel);
+      color:var(--text);
+      min-width:190px;
     }
 
     .btn{
@@ -131,17 +153,6 @@
     }
     .btn:hover{ transform:translateY(-1px) }
     .btn:is(:focus-visible){ outline:2px solid var(--ring); outline-offset:2px }
-
-    /* Header search input */
-    #site-search{
-      padding:.55rem .8rem;
-      border-radius:10px;
-      border:1px solid color-mix(in oklab, var(--text), transparent 88%);
-      background:var(--panel);
-      color:var(--text);
-      min-width:0;
-      max-width:220px;
-    }
 
     .hero{
       padding: clamp(36px, 6vw, 72px) 0;
@@ -249,32 +260,40 @@
       overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
     }
 
-    /* ========= Responsive tweaks ========= */
-
+    /* ========= Responsive nav (match index-style behavior) ========= */
     @media (max-width: 900px){
-      nav{
-        flex-wrap:wrap;
+      .nav-toggle{
+        display:inline-flex;
       }
-
       .navlinks{
-        order:3;
-        width:100%;
-        justify-content:flex-start;
-        overflow-x:auto;
-        padding-top:6px;
-      }
-
-      .header-controls{
-        order:2;
+        position:absolute;
+        inset: calc(100% + 4px) 0 auto;
         margin-left:0;
-        width:100%;
-        justify-content:flex-start;
-        flex-wrap:wrap;
+        padding:10px 12px 14px;
+        flex-direction:column;
+        align-items:stretch;
+        background: color-mix(in oklab, var(--bg), black 5%);
+        border: 1px solid color-mix(in oklab, var(--text), transparent 90%);
+        border-radius:0 0 16px 16px;
+        display:none;
+        z-index:49;
       }
-
-      #site-search{
-        flex:1 1 140px;
-        max-width:none;
+      .navlinks.open{
+        display:flex;
+      }
+      .nav-group{
+        flex-direction:column;
+        align-items:stretch;
+        gap:4px;
+      }
+      .nav-group.nav-extras{
+        border-top:1px solid color-mix(in oklab, var(--text), transparent 90%);
+        padding-top:8px;
+        margin-top:4px;
+      }
+      .nav-search{
+        width:100%;
+        min-width:0;
       }
 
       .hero{
@@ -321,18 +340,24 @@
           <span>Eigenbytes</span>
         </div>
 
-        <div class="navlinks" role="menubar">
-          <a role="menuitem" href="/">Home</a>
-          <a role="menuitem" href="/#blog">Blog</a>
-          <a role="menuitem" href="/#tutorials">Tutorials</a>
-          <a role="menuitem" href="/#videos">Videos</a>
-          <a role="menuitem" href="/more.html">About</a>
-        </div>
+        <!-- Mobile toggle button (matches index.html behavior) -->
+        <button id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+          ☰
+        </button>
 
-        <div class="header-controls">
-          <input id="site-search" placeholder="Search posts…" aria-label="Search posts" />
-          <button id="theme-toggle" class="btn" aria-pressed="false" title="Toggle theme">🌓</button>
-          <a class="btn" href="/">⬅ Back</a>
+        <div class="navlinks" role="menubar">
+          <div class="nav-group nav-pages">
+            <a role="menuitem" href="/">Home</a>
+            <a role="menuitem" href="/#blog">Blog</a>
+            <a role="menuitem" href="/#tutorials">Tutorials</a>
+            <a role="menuitem" href="/#videos">Videos</a>
+            <a role="menuitem" href="/more.html">About</a>
+          </div>
+          <div class="nav-group nav-extras">
+            <input id="site-search" class="nav-search" placeholder="Search posts…" aria-label="Search posts" />
+            <button id="theme-toggle" class="btn" aria-pressed="false" title="Toggle theme">🌓</button>
+            <a class="btn" href="/">⬅ Back</a>
+          </div>
         </div>
       </nav>
     </div>
@@ -385,7 +410,7 @@
   </template>
 
   <script type="module">
-    // --- Theme toggle (same behavior) ---
+    // --- Theme toggle (same behavior as other pages) ---
     const themeBtn = document.getElementById('theme-toggle');
     const root = document.documentElement;
     const savedTheme = localStorage.getItem('theme');
@@ -397,6 +422,16 @@
       themeBtn.setAttribute('aria-pressed', String(t==='dark'));
     });
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // --- Mobile nav toggle (matches index.html approach) ---
+    const navToggle = document.getElementById('nav-toggle');
+    const navLinksEl = document.querySelector('.navlinks');
+    navToggle?.addEventListener('click', () => {
+      const isOpen = navLinksEl?.classList.toggle('open');
+      if (navToggle) {
+        navToggle.setAttribute('aria-expanded', String(!!isOpen));
+      }
+    });
 
     // --- Data load ---
     let posts = [];
@@ -529,11 +564,7 @@
 
       // Pagination control
       const shown = paged.length;
-      if(shown < total){
-        loadMoreBtn.style.display = 'inline-flex';
-      } else {
-        loadMoreBtn.style.display = 'none';
-      }
+      loadMoreBtn.style.display = shown < total ? 'inline-flex' : 'none';
     }
 
     loadMoreBtn.addEventListener('click', ()=>{
