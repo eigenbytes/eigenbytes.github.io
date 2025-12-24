@@ -904,38 +904,6 @@
       </div>
     </section>
 
-    <section id="subscribe">
-      <div class="container">
-        <div class="card reveal">
-          <div class="pill-row">
-            <span class="dot"></span>
-            <span class="pill">Stay in the loop</span>
-            <span class="pill-tag">Low-noise, high-signal</span>
-          </div>
-          <h2>Get Eigenbytes updates</h2>
-          <p class="lead">Occasional emails when a new deep-dive, tutorial, or video drops. No spam, no growth-hacking funnels.</p>
-
-          <form
-            action="https://docs.google.com/forms/d/e/1FAIpQLSfgc8sC0bQQZp4X8a9Rnu4dXzX1tQYH5p5wqZuPrWm7QY2S0Q/formResponse"
-            method="POST"
-            target="_blank"
-            style="display:flex; flex-wrap:wrap; gap:10px; align-items:center"
-          >
-            <label class="sr-only" for="email">Email</label>
-            <input
-              id="email"
-              name="entry.123456789"
-              type="email"
-              required
-              placeholder="you@example.com"
-              style="flex:1 1 220px; padding:.6rem .8rem; border-radius:12px; border:1px solid color-mix(in oklab, var(--text), transparent 86%); background:var(--panel); color:var(--text)"
-            />
-            <button class="btn" type="submit">Join the list</button>
-          </form>
-        </div>
-      </div>
-    </section>
-
     <section id="contact">
       <div class="container">
         <div class="card reveal">
@@ -944,13 +912,115 @@
             <span class="pill">Contact</span>
             <span class="pill-tag">Say hi</span>
           </div>
-          <h2>Have a paper, idea, or collab?</h2>
-          <p class="lead">Reach out if you’re working on AI security, applied ML, or weird downgrade-resistant systems — or just want to swap notes.</p>
-          <p>For now, the easiest way is via <a href="mailto:eigenbytes.blog@gmail.com">eigenbytes.blog@gmail.com</a> or pinging on the Eigenbytes community links.</p>
+          <h2>Have a paper, idea, or collab? Want Eigenbytes updates?</h2>
+          <p class="lead">Send a note and it’ll land in the Eigenbytes inbox (and the linked spreadsheet). No spam, ever!</p>
+
+          <form id="contactForm" class="eb-form" autocomplete="on">
+            <div class="grid" style="gap:12px; margin-top:12px;">
+              <div class="g-6">
+                <label class="sr-only" for="contact-name">Name</label>
+                <input id="contact-name" name="name" type="text" placeholder="Name" required class="eb-input">
+              </div>
+              <div class="g-6">
+                <label class="sr-only" for="contact-email">Email</label>
+                <input id="contact-email" name="email" type="email" placeholder="Email" required class="eb-input">
+              </div>
+              <div class="g-12">
+                <label class="sr-only" for="contact-subject">Subject</label>
+                <input id="contact-subject" name="subject" type="text" placeholder="Subject" required class="eb-input">
+              </div>
+              <div class="g-12">
+                <label class="sr-only" for="contact-message">Message</label>
+                <textarea id="contact-message" name="message" rows="6" placeholder="Message" required class="eb-input" style="resize:vertical; min-height:140px;"></textarea>
+              </div>
+              <div class="g-12" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <button type="submit" class="btn" id="contactSubmit">Send message</button>
+                <span id="contactStatus" class="meta" role="status" aria-live="polite"></span>
+              </div>
+            </div>
+          </form>
+
+          <p class="meta" style="margin-top:10px;">
+            Prefer email? <a href="mailto:eigenbytes@gmail.com">eigenbytes@gmail.com</a>
+          </p>
+
+          <style>
+            /* Contact form inputs (match site tokens) */
+            .eb-input {
+              width: 100%;
+              padding: .65rem .8rem;
+              border-radius: 12px;
+              border: 1px solid color-mix(in oklab, var(--text), transparent 88%);
+              background: var(--panel);
+              color: var(--text);
+              outline: none;
+            }
+            .eb-input:focus {
+              border-color: color-mix(in oklab, var(--brand), white 18%);
+              box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand), transparent 78%);
+            }
+            :root[data-theme="light"] .eb-input {
+              background: var(--panel);
+            }
+          </style>
+
+          <script>
+            (function(){
+              const scriptURL = 'https://script.google.com/macros/s/AKfycbwx7gdGmuWYmoIRTRB9fmxXXdRjQiI_ngZ9X6s4re87wbqzRrSx5ozNK95PwBde-JDc/exec';
+              const form = document.getElementById('contactForm');
+              const status = document.getElementById('contactStatus');
+              const submitBtn = document.getElementById('contactSubmit');
+
+              if(!form) return;
+
+              function setStatus(msg) {
+                if(status) status.textContent = msg || '';
+              }
+
+              form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const name = document.getElementById('contact-name')?.value.trim();
+                const email = document.getElementById('contact-email')?.value.trim();
+                const subject = document.getElementById('contact-subject')?.value.trim();
+                const message = document.getElementById('contact-message')?.value.trim();
+
+                if(!name || !email || !subject || !message) {
+                  alert('Please fill in all fields.');
+                  return;
+                }
+
+                const payload = { name, email, subject, message };
+
+                setStatus('Sending…');
+                if(submitBtn) submitBtn.disabled = true;
+
+                fetch(scriptURL, {
+                  method: 'POST',
+                  mode: 'no-cors',
+                  body: JSON.stringify(payload),
+                  headers: { 'Content-Type': 'application/json' }
+                })
+                .then(() => {
+                  setStatus('Sent — thank you!');
+                  form.reset();
+                })
+                .catch((err) => {
+                  console.error('Contact form error:', err);
+                  setStatus('Error sending message. Please try again.');
+                  alert('Error sending message. Please try again later.');
+                })
+                .finally(() => {
+                  if(submitBtn) submitBtn.disabled = false;
+                  setTimeout(() => setStatus(''), 6000);
+                });
+              });
+            })();
+          </script>
         </div>
       </div>
     </section>
-  </main>
+</main>
 
   <!-- EigenBot widget -->
   <div id="chat-widget" style="position:fixed; right:20px; bottom:20px; width:350px; max-width:calc(100% - 40px); z-index:9999; font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif; font-size:14px;">

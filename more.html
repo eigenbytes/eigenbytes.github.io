@@ -123,6 +123,24 @@
     }
     figcaption{ font-size:12px; color:var(--muted); padding:6px 8px 4px }
 
+    
+    /* Form inputs (match site tokens) */
+    .eb-input {
+      width: 75%;
+      padding: .65rem .8rem;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--text);
+      outline: none;
+    }
+    .eb-input:focus {
+      border-color: color-mix(in oklab, var(--brand), white 18%);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand), transparent 78%);
+    }
+    :root[data-theme="light"] .eb-input {
+      background: var(--panel);
+    }
     /* Footer */
     footer{
       border-top:1px solid var(--line); color:var(--muted);
@@ -347,21 +365,20 @@
             <li><strong>GitHub:</strong> <a href="#">/eigenbytes</a></li>
           </ul>
         </div>
-        <aside class="g-4 card">
-          <h3>Subscribe</h3>
-          <p>Join the newsletter for weekly paper dives and tutorials.</p>
-          <form onsubmit="event.preventDefault(); alert('Subscribed! Thank you.');">
-            <label class="sr-only" for="email">Email</label>
-            <input id="email" type="email" required placeholder="you@domain.com"
-                   style="width:90%; padding:.7rem .9rem; border-radius:12px; border:1px solid var(--line); background:var(--panel-2); color:var(--text)">
-            <div style="height:10px"></div>
-            <button class="btn" type="submit"
-                    style="display:inline-flex; gap:.6rem; align-items:center; border:1px solid var(--line);
-                           background:linear-gradient(180deg, color-mix(in oklab, var(--panel), white 4%), color-mix(in oklab, var(--panel-2), black 2%));
-                           padding:.6rem .95rem; border-radius:12px; color:var(--text); box-shadow: var(--shadow)">
-              Subscribe
-            </button>
+        <aside class="g-4 card" id="subscribe">
+          <h4>Subscribe</h4>
+          <p>Get occasional emails when a new deep-dive, tutorial, or video drops. No spam.</p>
+
+          <form id="subscribeForm" class="eb-form" autocomplete="on">
+            <label class="sr-only" for="subscribe-email">Email</label>
+            <input id="subscribe-email" name="email" type="email" required placeholder="you@example.com" class="eb-input">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px;">
+              <button class="btn" type="submit" id="subscribeSubmit">Subscribe</button>
+              <span id="subscribeStatus" class="meta" role="status" aria-live="polite"></span>
+            </div>
           </form>
+
+          <p class="meta" style="margin-top:10px;">We’ll only email when something worth reading ships.</p>
         </aside>
       </div>
     </section>
@@ -370,7 +387,7 @@
   <footer>
     <div class="container" style="display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap">
       <small>© <span id="year"></span> Eigenbytes.blog. All rights reserved.</small>
-      <small><a href="#" style="color:inherit">Privacy</a> • <a href="#" style="color:inherit">Terms</a> • <a href="#" style="color:inherit">RSS</a></small>
+      <small><a href="privacy.html" style="color:inherit">Privacy</a> • <a href="terms.html" style="color:inherit">Terms</a> • <a href="feed.xml" style="color:inherit">RSS</a></small>
     </div>
   </footer>
 
@@ -382,5 +399,56 @@
       document.getElementById('year').textContent = new Date().getFullYear();
     })();
   </script>
+
+  <script>
+    (function(){
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbwx7gdGmuWYmoIRTRB9fmxXXdRjQiI_ngZ9X6s4re87wbqzRrSx5ozNK95PwBde-JDc/exec';
+      const form = document.getElementById('subscribeForm');
+      const status = document.getElementById('subscribeStatus');
+      const submitBtn = document.getElementById('subscribeSubmit');
+
+      if(!form) return;
+
+      function setStatus(msg) {
+        if(status) status.textContent = msg || '';
+      }
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        const email = document.getElementById('subscribe-email')?.value.trim();
+        if(!email) {
+          alert('Please enter your email.');
+          return;
+        }
+
+        const payload = { type: 'subscribe', email };
+
+        setStatus('Subscribing…');
+        if(submitBtn) submitBtn.disabled = true;
+
+        fetch(scriptURL, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(() => {
+          setStatus('Subscribed — welcome!');
+          form.reset();
+        })
+        .catch((err) => {
+          console.error('Subscribe form error:', err);
+          setStatus('Error subscribing. Please try again.');
+          alert('Error subscribing. Please try again later.');
+        })
+        .finally(() => {
+          if(submitBtn) submitBtn.disabled = false;
+          setTimeout(() => setStatus(''), 6000);
+        });
+      });
+    })();
+  </script>
+
 </body>
 </html>
